@@ -1,6 +1,6 @@
 # ComputerGraphics_Project
-# OpenGL
-# Cpp
+- OpenGL
+- Cpp
 
 [22-11-10]
 1. Drawing 3D Sphere
