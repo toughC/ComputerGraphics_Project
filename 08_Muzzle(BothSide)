@@ -1,106 +1,106 @@
 //#include<glut.h>
 //#include<gl.h>
 //#include<glu.h>
-#include "person.h"		//»ç¶÷
-#include "particle.h"	//ÆÄÆ¼Å¬
-#include "treeCyl.h"	//ÇÁ·ºÅ» Æ®¸®
-#include "car.h"		//ÀÚµ¿Â÷
+#include "person.h"		//ì‚¬ëŒ
+#include "particle.h"	//íŒŒí‹°í´
+#include "treeCyl.h"	//í”„ë ‰íƒˆ íŠ¸ë¦¬
+#include "car.h"		//ìë™ì°¨
 
 using namespace std;
 
-static GLfloat MyPlane[] = { 1.0, 0.0, 0.0, 0.0 };//³ª¹«2 »ı¼º¿ë
+static GLfloat MyPlane[] = { 1.0, 0.0, 0.0, 0.0 };//ë‚˜ë¬´2 ìƒì„±ìš©
 
-const int MAX_ANINUM = 1;				//½º·¹µå ¾Ö´Ï¸ÅÀÌ¼Ç ÃÑ°¹¼ö
+const int MAX_ANINUM = 1;				//ìŠ¤ë ˆë“œ ì• ë‹ˆë§¤ì´ì…˜ ì´ê°¯ìˆ˜
 const int MAX_PGENERATOR = 10;
 
-TreeCyl leafs[100000];//ÇÁ·ºÅ» ÀÌ¿ëÇØ ±×¸± ¹è¿­
+TreeCyl leafs[100000];//í”„ë ‰íƒˆ ì´ìš©í•´ ê·¸ë¦´ ë°°ì—´
 
 float temp1 = 0.1, temp2 = 0.1;
-float lifeDot = 0.818 / 1000.0;	//Ã¼·Â1´ç Ç¥½ÃµµÆ®
+float lifeDot = 0.818 / 1000.0;	//ì²´ë ¥1ë‹¹ í‘œì‹œë„íŠ¸
 
-double width;	//À©µµ¿ì Å©±â ¹Ş±âÀ§ÇÑ º¯¼ö
+double width;	//ìœˆë„ìš° í¬ê¸° ë°›ê¸°ìœ„í•œ ë³€ìˆ˜
 double height;
-double radius;	//ÃÊÁ¡-½ÃÁ¡°£ °Å¸®(È¸Àü¿ë)
+double radius;	//ì´ˆì -ì‹œì ê°„ ê±°ë¦¬(íšŒì „ìš©)
 
 int timer2 = 0;
-//int sleepSpeed = 14;	//¸Å ÇÁ·¹ÀÓ Áö¿¬½Ã°£(ÃÊ´ç 70ÇÁ·¹ÀÓ)
-int sleepSpeed = 17;	//¸Å ÇÁ·¹ÀÓ Áö¿¬½Ã°£(ÃÊ´ç 60ÇÁ·¹ÀÓ)
-short keyDoubleTouchTime = 20;	//¾ó¸¶ ÀÌ³»¿¡ Å°¸¦ µÎ¹ø´©¸£¸é ´õºíÀÔ·ÂÀ¸·Î º¼°ÍÀÎ°¡
-short up1, down1, left1, right1;		//ÀÔ·Â °¨Áö¿ë
-short up2, down2, left2, right2;	//´õºíÅÍÄ¡ °¨Áö¿ë
+//int sleepSpeed = 14;	//ë§¤ í”„ë ˆì„ ì§€ì—°ì‹œê°„(ì´ˆë‹¹ 70í”„ë ˆì„)
+int sleepSpeed = 17;	//ë§¤ í”„ë ˆì„ ì§€ì—°ì‹œê°„(ì´ˆë‹¹ 60í”„ë ˆì„)
+short keyDoubleTouchTime = 20;	//ì–¼ë§ˆ ì´ë‚´ì— í‚¤ë¥¼ ë‘ë²ˆëˆ„ë¥´ë©´ ë”ë¸”ì…ë ¥ìœ¼ë¡œ ë³¼ê²ƒì¸ê°€
+short up1, down1, left1, right1;		//ì…ë ¥ ê°ì§€ìš©
+short up2, down2, left2, right2;	//ë”ë¸”í„°ì¹˜ ê°ì§€ìš©
 
-bool isFogDraw = true;								// ¸Õ°÷ ¾È°³È¿°ú on/off¿ë
-GLuint fogMode[] = { GL_EXP, GL_EXP2, GL_LINEAR };	// ¼¼°¡Áö ¾È°³Á¾·ù
-GLuint fogFilter = 2;								// »ç¿ëÇÒ ¾È°³Á¾·ù
-GLfloat fogColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };      // ¾È°³»ö»ó
+bool isFogDraw = true;								// ë¨¼ê³³ ì•ˆê°œíš¨ê³¼ on/offìš©
+GLuint fogMode[] = { GL_EXP, GL_EXP2, GL_LINEAR };	// ì„¸ê°€ì§€ ì•ˆê°œì¢…ë¥˜
+GLuint fogFilter = 2;								// ì‚¬ìš©í•  ì•ˆê°œì¢…ë¥˜
+GLfloat fogColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };      // ì•ˆê°œìƒ‰ìƒ
 
-int FlatShaded = 0;// flatshading°ú wireframeÀ» Åä±Û¸µÀ» À§ÇÑ ºÎ¿ï º¯¼ö
+int FlatShaded = 0;// flatshadingê³¼ wireframeì„ í† ê¸€ë§ì„ ìœ„í•œ ë¶€ìš¸ ë³€ìˆ˜
 int Wireframed = 0;
 
-double TableX = 5.0;	//Å×ÀÌºí Å©±â
+double TableX = 5.0;	//í…Œì´ë¸” í¬ê¸°
 double TableY = 8.0;
-double TableHeight = 2.0;//Å×ÀÌºí ³ôÀÌ
+double TableHeight = 2.0;//í…Œì´ë¸” ë†’ì´
 
-bool isBgmPlay = true;	//bgm Àç»ı¿©ºÎ
-bool isPaused = false;	//ÀÏ½ÃÁ¤Áö ¿©ºÎ
-bool isAtDraw = false;	//ÃÊÁ¡,Àü¿ªÁÂÇ¥°è ¿øÁ¡ ±×¸®³ª
-bool isHelpDraw = false;	//µµ¿ò¸» º¸ÀÌ³ª
-bool isLifeBarDraw = false;	//¶óÀÌÇÁ¹Ù ±×¸®³ª
-bool isCanMouse = true;	//¸¶¿ì½º ÄÁÆ®·Ñ °¡´ÉÇÏ³ª 
-bool isParticleDraw = true;		//ÆÄÆ¼Å¬ ±×¸®³ª
-bool isCarDraw = false;		//Â÷ ±×¸®³ª
-bool isCyren = false;		//»çÀÌ·»È¿°ú
-short treeDrawMode = 0;	//Æ®¸® ¸ğµå   0 : ½Ç¸°´õ   1: ÇÁ·¢Å» Æ®¸®
-short mountainDrawMode = 0;	//»ê ¸ğµå   0 : ´Ü¼ø   1: ÅØ½ºÃ³
+bool isBgmPlay = true;	//bgm ì¬ìƒì—¬ë¶€
+bool isPaused = false;	//ì¼ì‹œì •ì§€ ì—¬ë¶€
+bool isAtDraw = false;	//ì´ˆì ,ì „ì—­ì¢Œí‘œê³„ ì›ì  ê·¸ë¦¬ë‚˜
+bool isHelpDraw = false;	//ë„ì›€ë§ ë³´ì´ë‚˜
+bool isLifeBarDraw = false;	//ë¼ì´í”„ë°” ê·¸ë¦¬ë‚˜
+bool isCanMouse = true;	//ë§ˆìš°ìŠ¤ ì»¨íŠ¸ë¡¤ ê°€ëŠ¥í•˜ë‚˜ 
+bool isParticleDraw = true;		//íŒŒí‹°í´ ê·¸ë¦¬ë‚˜
+bool isCarDraw = false;		//ì°¨ ê·¸ë¦¬ë‚˜
+bool isCyren = false;		//ì‚¬ì´ë Œíš¨ê³¼
+short treeDrawMode = 0;	//íŠ¸ë¦¬ ëª¨ë“œ   0 : ì‹¤ë¦°ë”   1: í”„ë™íƒˆ íŠ¸ë¦¬
+short mountainDrawMode = 0;	//ì‚° ëª¨ë“œ   0 : ë‹¨ìˆœ   1: í…ìŠ¤ì²˜
 
-int ViewX = 450;// ¸¶¿ì½º ¿òÁ÷ÀÓ¿¡ µû¶ó ½ÃÁ¡À» ¹Ù²Ù±â À§ÇÑ º¯¼ö
+int ViewX = 450;// ë§ˆìš°ìŠ¤ ì›€ì§ì„ì— ë”°ë¼ ì‹œì ì„ ë°”ê¾¸ê¸° ìœ„í•œ ë³€ìˆ˜
 int ViewY = 170;//-25;
 
-int oldX;	//¸¶¿ì½ºÄ¿¼­À§Ä¡
+int oldX;	//ë§ˆìš°ìŠ¤ì»¤ì„œìœ„ì¹˜
 int oldY;
 
-double plusX;	//´õÇÒ°¢µµ
+double plusX;	//ë”í• ê°ë„
 double plusY;
 
-//float eyeAngle[3];	//½ÃÁ¡°¢µµ
+//float eyeAngle[3];	//ì‹œì ê°ë„
 
-GLUquadricObj* cyl;	//½Ç¸°´õ °´Ã¼
+GLUquadricObj* cyl;	//ì‹¤ë¦°ë” ê°ì²´
 
-int TableListID;	//¸®½ºÆ®¿ë ID. Å×ÀÌºí
-int netID;			//¸®½ºÆ®¿ë ID. Å×ÀÌºí ³×Æ®
-int listID[20];			//¸®½ºÆ®¿ë ID
+int TableListID;	//ë¦¬ìŠ¤íŠ¸ìš© ID. í…Œì´ë¸”
+int netID;			//ë¦¬ìŠ¤íŠ¸ìš© ID. í…Œì´ë¸” ë„¤íŠ¸
+int listID[20];			//ë¦¬ìŠ¤íŠ¸ìš© ID
 
-float ball[3];  //º¼À§Ä¡
+float ball[3];  //ë³¼ìœ„ì¹˜
 
-float RacketColor[3] = { 200 / 255.0, 50 / 255.0, 50 / 255.0 };		//¶óÄÏ»ö
+float RacketColor[3] = { 200 / 255.0, 50 / 255.0, 50 / 255.0 };		//ë¼ì¼“ìƒ‰
 
-objects objs;						//°´Ã¼µé(»ç¶÷¹è¿­)
+objects objs;						//ê°ì²´ë“¤(ì‚¬ëŒë°°ì—´)
 Car* car = new Car(&objs);
 
-HANDLE Thread[MAX_ANINUM];				//¾Ö´Ï¸ÅÀÌ¼Ç¿ë ½º·¹µå (ÁßÁö°¡´ÉÄÉ ÇÏ±â À§ÇÔ)
-UINT ThreadState[MAX_ANINUM];			//½º·¹µå »óÅÂ ¹ŞÀ» º¯¼ö(ÇöÀç ¹Ì»ç¿ë. »ç¿ë½Ã Á¾·á¿©ºÎ ¾Ë¼öÀÖÀ½)
-UINT WINAPI AniIntro(void* arg);		//½º·¹µå È£ÃâÇÔ¼ö - ÀÎÆ®·Î
-UINT WINAPI AniEnding(void* arg);	//½º·¹µå È£ÃâÇÔ¼ö - ÇÎÆş
+HANDLE Thread[MAX_ANINUM];				//ì• ë‹ˆë§¤ì´ì…˜ìš© ìŠ¤ë ˆë“œ (ì¤‘ì§€ê°€ëŠ¥ì¼€ í•˜ê¸° ìœ„í•¨)
+UINT ThreadState[MAX_ANINUM];			//ìŠ¤ë ˆë“œ ìƒíƒœ ë°›ì„ ë³€ìˆ˜(í˜„ì¬ ë¯¸ì‚¬ìš©. ì‚¬ìš©ì‹œ ì¢…ë£Œì—¬ë¶€ ì•Œìˆ˜ìˆìŒ)
+UINT WINAPI AniIntro(void* arg);		//ìŠ¤ë ˆë“œ í˜¸ì¶œí•¨ìˆ˜ - ì¸íŠ¸ë¡œ
+UINT WINAPI AniEnding(void* arg);	//ìŠ¤ë ˆë“œ í˜¸ì¶œí•¨ìˆ˜ - í•‘í
 
-string currSound;	//ÇöÀç Àç»ıÁßÀÎ È¿°úÀ½. (²ô±â À§ÇÔ)
+string currSound;	//í˜„ì¬ ì¬ìƒì¤‘ì¸ íš¨ê³¼ìŒ. (ë„ê¸° ìœ„í•¨)
 
 //-----------------------------------------
-// ÆÄÆ¼Å¬ »ı¼º±â ¹è¿­
+// íŒŒí‹°í´ ìƒì„±ê¸° ë°°ì—´
 ParticleGenerator pGenerators[MAX_PGENERATOR];
 
-//----- ±¤ ¿ø ----------------------------
-GLfloat ambi0[] = { 0.4f, 0.4f, 0.4f, 1.0f };//ÁÖº¯±¤ 	//-----ÇŞºû 
-GLfloat diff0[] = { 0.7f, 0.7f, 0.7f, 1.0f };//È®»ê±¤
-//GLfloat spec0[] = {1.0f, 1.0f, 1.0f, 1.0f};		//¹İ»ç±¤
-GLfloat spec0[] = { 0.9, 0.9, 0.9, 1.0 };		//¹İ»ç±¤
-GLfloat posi0[] = { 400.0, 800.0, -300.0, 1.0 };	//±¤¿øÀ§Ä¡. x,y,z,°Å¸®
+//----- ê´‘ ì› ----------------------------
+GLfloat ambi0[] = { 0.4f, 0.4f, 0.4f, 1.0f };//ì£¼ë³€ê´‘ 	//-----í–‡ë¹› 
+GLfloat diff0[] = { 0.7f, 0.7f, 0.7f, 1.0f };//í™•ì‚°ê´‘
+//GLfloat spec0[] = {1.0f, 1.0f, 1.0f, 1.0f};		//ë°˜ì‚¬ê´‘
+GLfloat spec0[] = { 0.9, 0.9, 0.9, 1.0 };		//ë°˜ì‚¬ê´‘
+GLfloat posi0[] = { 400.0, 800.0, -300.0, 1.0 };	//ê´‘ì›ìœ„ì¹˜. x,y,z,ê±°ë¦¬
 
-GLfloat ambi1[] = { 0.4f, 0.4f, 0.4f, 1.0f };//ÁÖº¯±¤		//Èòºû
-GLfloat diff1[] = { 1.0f, 1.0f, 1.0f, 1.0f };//È®»ê±¤
-GLfloat spec1[] = { 1.0f, 1.0f, 1.0f, 1.0f };		//¹İ»ç±¤
-GLfloat posi1[] = { 0.0, 10.0, -3.0, 1.0 };	//±¤¿øÀ§Ä¡. x,y,z,°Å¸®
+GLfloat ambi1[] = { 0.4f, 0.4f, 0.4f, 1.0f };//ì£¼ë³€ê´‘		//í°ë¹›
+GLfloat diff1[] = { 1.0f, 1.0f, 1.0f, 1.0f };//í™•ì‚°ê´‘
+GLfloat spec1[] = { 1.0f, 1.0f, 1.0f, 1.0f };		//ë°˜ì‚¬ê´‘
+GLfloat posi1[] = { 0.0, 10.0, -3.0, 1.0 };	//ê´‘ì›ìœ„ì¹˜. x,y,z,ê±°ë¦¬
 
-GLfloat ambi5[] = { 1.0, 0.0, 0.0, 1.0 };				//ºÓÀººû
+GLfloat ambi5[] = { 1.0, 0.0, 0.0, 1.0 };				//ë¶‰ì€ë¹›
 GLfloat diff5[] = { 1.0, 0.0, 0.0, 1.0 };
 //GLfloat spec5[] = {1.0, 1.0, 1.0, 1.0};
 GLfloat spec5[] = { 1.0, 0.0, 0.0, 1.0 };
@@ -108,48 +108,48 @@ GLfloat posi5[] = { 3.0, 5.0, -1.0, 1.0 };
 GLfloat spotAngle5[] = { 10.0 };
 GLfloat angleX5 = 0;
 GLfloat dir5[] = { 0,0,0 };
-GLfloat dir6[] = { 0,0,0 };				//ºÓÀººû2
+GLfloat dir6[] = { 0,0,0 };				//ë¶‰ì€ë¹›2
 
-GLfloat mAmbi[] = { 0.5, 0.5, 0.5, 1 };	//¹°Ã¼Æ¯¼º
+GLfloat mAmbi[] = { 0.5, 0.5, 0.5, 1 };	//ë¬¼ì²´íŠ¹ì„±
 GLfloat mDiff[] = { 0.5, 0.5, 0.5, 1 };
 GLfloat mSpec[] = { 0.5, 0.5, 0.5, 1.0 };
 GLfloat mShin[] = { 5.0 };
 
-//----------------  ÇÔ ¼ö ----------------------------------------
+//----------------  í•¨ ìˆ˜ ----------------------------------------
 void setupGL();
 void setupParticle();
 
-void InitLight();				//±¤¿øÃÊ±âÈ­
-void InitPosition();			//»ç¶÷À§Ä¡,°¢µµÃÊ±âÈ­
-void MyMainMenu(int entryID);	//¿ìÅ¬¸¯¸Ş´º
-void MySubMenu(int entryID);	//¼­ºê¸Ş´º
-void Create_TableList();		//µğ½ºÇÃ·¹ÀÌ¸®½ºÆ® »ı¼º
-void MyMouseMove(int button, int state, GLint X, GLint Y);	//¸¶¿ì½º Å¬¸¯ÀÌº¥Æ® ÀÎ½ÄÇÏ´Â ÇÔ¼ö
-void MyMotion(GLint X, GLint Y);					//¸¶¿ì½º Å¬¸¯ÀÌµ¿ ÀÌº¥Æ® ÀÎ½ÄÇÏ´Â ÇÔ¼ö
-void MyMouseMove2(int button, int state, GLint X, GLint Y);	//¸¶¿ì½º °­Á¦Å¬¸¯
-void MyMotion2(GLint X, GLint Y);					//¸¶¿ì½º °­Á¦Å¬¸¯ÀÌµ¿
-void EyePosChange(GLint angleX, GLint angleY);		//½ÃÁ¡ÀÌµ¿(MyMotion¿¡¼­ ºĞ¸®. ¾Ö´Ï¿¡¼­ ÄÁÆ®·Ñ°¡´ÉÄÉ ÇÏ±âÀ§ÇÔ)
-void MyPassiveMotion(GLint X, GLint Y);	//¸¶¿ì½º Å¬¸¯¾øÀÌ ÀÌµ¿¸¸À¸·Î ÀÌº¥Æ®¹Ş´Â ÇÔ¼ö(¹Ì»ç¿ë)
-void CalculateEyeXY();		//½ÃÁ¡ÁÂÇ¥ ±¸ÇÏ´Â ÇÔ¼ö
-void CalculateRadius();		//ÃÊÁ¡-½ÃÁ¡°£ °Å¸®/°¢µµ±¸ÇÔ
-void MyKeyboard(unsigned char key, int x, int y);	//Å°º¸µå Äİ¹é
-void Specialkeys(int key, int x, int y);		//¹æÇâÅ° µî Äİ¹é
-void DrawTable();//(¹Ì»ç¿ë)
-void MyDisplay();								//µğ½ºÇÃ·¹ÀÌ Äİ¹é
-void MyReshape(int w, int h);					//È­¸éÁ¶Á¤ Äİ¹é
-void MyTimer(int Value);						//Å¸ÀÌ¸Ó Äİ¹é
-//void DrawRacket();								//¶óÄÏ ±×¸®±â
-//void DrawBall();								//°ø ±×¸®±â
-void MyKeyboardUp(unsigned char key, int x, int y);	//Å°º¸µå ¾÷
-void p1ActionChange();								//ÁÖÀÎ°ø ¹æÇâÁ¶ÀÛ¿¡ µû¸¥ Çàµ¿À» ½ÃÅ°´Â ÇÔ¼ö
-void DrawLifeBar();							//¶óÀÌÇÁ¹Ù Ç¥½Ã
-void DrawCylTree();							//½Ç¸°´õ Æ®¸® Ãâ·Â
-void DrawFractalTree();							//ÇÁ·¢Å» Æ®¸® Ãâ·Â
-void RenderText(char* text, float posX, float posY);	//±ÛÀÚÃâ·Â
-void RenderHelp();							//µµ¿ò¸» Ãâ·Â
-void RenderEnd();							//³¡ Ãâ·Â
+void InitLight();				//ê´‘ì›ì´ˆê¸°í™”
+void InitPosition();			//ì‚¬ëŒìœ„ì¹˜,ê°ë„ì´ˆê¸°í™”
+void MyMainMenu(int entryID);	//ìš°í´ë¦­ë©”ë‰´
+void MySubMenu(int entryID);	//ì„œë¸Œë©”ë‰´
+void Create_TableList();		//ë””ìŠ¤í”Œë ˆì´ë¦¬ìŠ¤íŠ¸ ìƒì„±
+void MyMouseMove(int button, int state, GLint X, GLint Y);	//ë§ˆìš°ìŠ¤ í´ë¦­ì´ë²¤íŠ¸ ì¸ì‹í•˜ëŠ” í•¨ìˆ˜
+void MyMotion(GLint X, GLint Y);					//ë§ˆìš°ìŠ¤ í´ë¦­ì´ë™ ì´ë²¤íŠ¸ ì¸ì‹í•˜ëŠ” í•¨ìˆ˜
+void MyMouseMove2(int button, int state, GLint X, GLint Y);	//ë§ˆìš°ìŠ¤ ê°•ì œí´ë¦­
+void MyMotion2(GLint X, GLint Y);					//ë§ˆìš°ìŠ¤ ê°•ì œí´ë¦­ì´ë™
+void EyePosChange(GLint angleX, GLint angleY);		//ì‹œì ì´ë™(MyMotionì—ì„œ ë¶„ë¦¬. ì• ë‹ˆì—ì„œ ì»¨íŠ¸ë¡¤ê°€ëŠ¥ì¼€ í•˜ê¸°ìœ„í•¨)
+void MyPassiveMotion(GLint X, GLint Y);	//ë§ˆìš°ìŠ¤ í´ë¦­ì—†ì´ ì´ë™ë§Œìœ¼ë¡œ ì´ë²¤íŠ¸ë°›ëŠ” í•¨ìˆ˜(ë¯¸ì‚¬ìš©)
+void CalculateEyeXY();		//ì‹œì ì¢Œí‘œ êµ¬í•˜ëŠ” í•¨ìˆ˜
+void CalculateRadius();		//ì´ˆì -ì‹œì ê°„ ê±°ë¦¬/ê°ë„êµ¬í•¨
+void MyKeyboard(unsigned char key, int x, int y);	//í‚¤ë³´ë“œ ì½œë°±
+void Specialkeys(int key, int x, int y);		//ë°©í–¥í‚¤ ë“± ì½œë°±
+void DrawTable();//(ë¯¸ì‚¬ìš©)
+void MyDisplay();								//ë””ìŠ¤í”Œë ˆì´ ì½œë°±
+void MyReshape(int w, int h);					//í™”ë©´ì¡°ì • ì½œë°±
+void MyTimer(int Value);						//íƒ€ì´ë¨¸ ì½œë°±
+//void DrawRacket();								//ë¼ì¼“ ê·¸ë¦¬ê¸°
+//void DrawBall();								//ê³µ ê·¸ë¦¬ê¸°
+void MyKeyboardUp(unsigned char key, int x, int y);	//í‚¤ë³´ë“œ ì—…
+void p1ActionChange();								//ì£¼ì¸ê³µ ë°©í–¥ì¡°ì‘ì— ë”°ë¥¸ í–‰ë™ì„ ì‹œí‚¤ëŠ” í•¨ìˆ˜
+void DrawLifeBar();							//ë¼ì´í”„ë°” í‘œì‹œ
+void DrawCylTree();							//ì‹¤ë¦°ë” íŠ¸ë¦¬ ì¶œë ¥
+void DrawFractalTree();							//í”„ë™íƒˆ íŠ¸ë¦¬ ì¶œë ¥
+void RenderText(char* text, float posX, float posY);	//ê¸€ìì¶œë ¥
+void RenderHelp();							//ë„ì›€ë§ ì¶œë ¥
+void RenderEnd();							//ë ì¶œë ¥
 
-void drawLightPoll();  //°¡·Îµî ¸¸µé±â
+void drawLightPoll();  //ê°€ë¡œë“± ë§Œë“¤ê¸°
 void drawLightPoll()
 
 {
@@ -167,7 +167,7 @@ void drawLightPoll()
 }
 
 //---------------------------------------------------------------------
-//µ¥¸ó ÅØ½ºÃ³·ÎµåÇÔ¼ö(jpg,png°¡´É)
+//ë°ëª¬ í…ìŠ¤ì²˜ë¡œë“œí•¨ìˆ˜(jpg,pngê°€ëŠ¥)
 // Function load a image, turn it into a texture, and return the texture ID as a GLuint for use
 GLuint loadImage(const char* theFileName)
 {
@@ -199,7 +199,7 @@ GLuint loadImage(const char* theFileName)
 		{
 			error = ilGetError();
 			std::cout << "Image conversion failed - IL reports error: " << error << " - " << iluErrorString(error) << std::endl;
-			//			exit(-1);	//ÀÌ¹ÌÁö ¾ø¾îµµ Á¾·á¾ÈµÇ°Ô ¼³Á¤
+			//			exit(-1);	//ì´ë¯¸ì§€ ì—†ì–´ë„ ì¢…ë£Œì•ˆë˜ê²Œ ì„¤ì •
 			return NULL;
 		}
 
@@ -216,9 +216,9 @@ GLuint loadImage(const char* theFileName)
 		// Set texture interpolation method to use linear interpolation (no MIPMAPS)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);//¹Ó¸ÊºÒ°¡ÇÑµí
+		//		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);//ë°‰ë§µë¶ˆê°€í•œë“¯
 
-				// Specify the texture specification	À­ÁÙ ¹Ó¸Ê ¾Æ´Ò½Ã
+				// Specify the texture specification	ìœ—ì¤„ ë°‰ë§µ ì•„ë‹ì‹œ
 		glTexImage2D(GL_TEXTURE_2D,     // Type of texture
 			0,    // Pyramid level (for mip-mapping) - 0 is the top level
 			ilGetInteger(IL_IMAGE_BPP), // Image colour depth
@@ -229,14 +229,14 @@ GLuint loadImage(const char* theFileName)
 			GL_UNSIGNED_BYTE,  // Image data type
 			ilGetData());   // The actual image data itself
 
-		//¹Ó¸ÊÀÏ½Ã
+		//ë°‰ë§µì¼ì‹œ
 		//gluBuild2DMipmaps(GL_TEXTURE_2D, 3, TextureImage->sizeX, TextureImage[0]->sizeY, GL_RGB, GL_UNSIGNED_BYTE, TextureImage[0]->data);
 	}
 	else // If we failed to open the image file in the first place...
 	{
 		error = ilGetError();
 		std::cout << "Image load failed - IL reports error: " << error << " - " << iluErrorString(error) << std::endl;
-		//		exit(-1); //¿¡·¯³ªµµ Á¾·á¾ÈµÇ°Ô
+		//		exit(-1); //ì—ëŸ¬ë‚˜ë„ ì¢…ë£Œì•ˆë˜ê²Œ
 		return NULL;
 	}
 
@@ -247,35 +247,35 @@ GLuint loadImage(const char* theFileName)
 	return textureID; // Return the GLuint to the texture so you can use it!
 }
 
-//»ç¶÷À§Ä¡, °¢µµ ÃÊ±âÈ­
+//ì‚¬ëŒìœ„ì¹˜, ê°ë„ ì´ˆê¸°í™”
 void InitPosition()
 {
-	sndPlaySound(NULL, SND_ASYNC);//¼Ò¸®Àç»ı ÁßÁö
+	sndPlaySound(NULL, SND_ASYNC);//ì†Œë¦¬ì¬ìƒ ì¤‘ì§€
 
 	DWORD nExitCode = NULL;
 	for (int i = 0; i < MAX_ANINUM; i++) {
 		GetExitCodeThread(Thread[i], &nExitCode);	//
-		TerminateThread(Thread[i], nExitCode);		//½º·¹µå °­Á¦Á¾·á
-		CloseHandle(Thread[i]);					//Æ÷ÀÎÅÍ Á¦°Å
+		TerminateThread(Thread[i], nExitCode);		//ìŠ¤ë ˆë“œ ê°•ì œì¢…ë£Œ
+		CloseHandle(Thread[i]);					//í¬ì¸í„° ì œê±°
 	}
 
-	for (unsigned int i = 0; i < objs.people.size(); i++) {	//»ç¶÷¹è¿­ µ¹¸ç
-		objs.people.at(i)->InitPosition();				//ÁÂÇ¥,°¢µµ ÃÊ±âÈ­
-		objs.people.at(i)->InitColor();				//»öÃÊ±âÈ­		
+	for (unsigned int i = 0; i < objs.people.size(); i++) {	//ì‚¬ëŒë°°ì—´ ëŒë©°
+		objs.people.at(i)->InitPosition();				//ì¢Œí‘œ,ê°ë„ ì´ˆê¸°í™”
+		objs.people.at(i)->InitColor();				//ìƒ‰ì´ˆê¸°í™”		
 	}
 
-	double tempAtX = objs.AtX;	//ÃÊÁ¡º¯È­ Â÷ÀÌ°è»ê¿ë
+	double tempAtX = objs.AtX;	//ì´ˆì ë³€í™” ì°¨ì´ê³„ì‚°ìš©
 	double tempAtY = objs.AtY;
 	double tempAtZ = objs.AtZ;
-	objs.AtX = 3;		//ÃÊÁ¡
+	objs.AtX = 3;		//ì´ˆì 
 	objs.AtY = 14;
 	objs.AtZ = 2;
-	objs.EyeX -= tempAtX - objs.AtX;	//½ÃÁ¡µµ ÃÊÁ¡ÀÌµ¿Ä¡ ¸¸Å­ ÀÌµ¿
+	objs.EyeX -= tempAtX - objs.AtX;	//ì‹œì ë„ ì´ˆì ì´ë™ì¹˜ ë§Œí¼ ì´ë™
 	objs.EyeY -= tempAtY - objs.AtY;
 	objs.EyeZ -= tempAtZ - objs.AtZ;
 }
 
-//Á÷Á¢±×¸®´Â Å¥ºê
+//ì§ì ‘ê·¸ë¦¬ëŠ” íë¸Œ
 GLvoid glDrawCube()
 {
 	glBegin(GL_QUADS);
@@ -318,76 +318,76 @@ GLvoid glDrawCube()
 	glEnd();
 }
 
-//±¤¿ø&¾È°³¼³Á¤
+//ê´‘ì›&ì•ˆê°œì„¤ì •
 void InitLight() {
-	glClearColor(0.9f, 0.9f, 0.9f, 1.0f);            // ¾È°³ »öÀ¸·Î È­¸éÀ» Áö¿ò
-	glFogi(GL_FOG_MODE, fogMode[fogFilter]);        // ¾È°³¸ğµå 0~2. exp, exp2, linear
-	glFogfv(GL_FOG_COLOR, fogColor);            // ¾È°³ »öÀ» ¼³Á¤
-	glFogf(GL_FOG_DENSITY, 0.1f);                // ¾È°³ÀÇ ¹Ğµµ(exp¸¸)
-//	glHint(GL_FOG_HINT, GL_DONT_CARE);            // ¾È°³ ÈùÆ® °ª. - openglÀÚµ¿
-	glHint(GL_FOG_HINT, GL_FASTEST);            // ¾È°³ ÈùÆ® °ª.	Á¤Á¡´ç »ı¼º
-//	glHint(GL_FOG_HINT, GL_NICEST);            // ¾È°³ ÈùÆ® °ª.	ÇÈ¼¿´ç »ı¼º
-	glFogf(GL_FOG_START, -50.0f);                // ¾È°³ ½ÃÀÛ ±íÀÌ
-	glFogf(GL_FOG_END, 400.0f);                // ¾È°³ ³¡ ±íÀÌ
+	glClearColor(0.9f, 0.9f, 0.9f, 1.0f);            // ì•ˆê°œ ìƒ‰ìœ¼ë¡œ í™”ë©´ì„ ì§€ì›€
+	glFogi(GL_FOG_MODE, fogMode[fogFilter]);        // ì•ˆê°œëª¨ë“œ 0~2. exp, exp2, linear
+	glFogfv(GL_FOG_COLOR, fogColor);            // ì•ˆê°œ ìƒ‰ì„ ì„¤ì •
+	glFogf(GL_FOG_DENSITY, 0.1f);                // ì•ˆê°œì˜ ë°€ë„(expë§Œ)
+//	glHint(GL_FOG_HINT, GL_DONT_CARE);            // ì•ˆê°œ íŒíŠ¸ ê°’. - openglìë™
+	glHint(GL_FOG_HINT, GL_FASTEST);            // ì•ˆê°œ íŒíŠ¸ ê°’.	ì •ì ë‹¹ ìƒì„±
+//	glHint(GL_FOG_HINT, GL_NICEST);            // ì•ˆê°œ íŒíŠ¸ ê°’.	í”½ì…€ë‹¹ ìƒì„±
+	glFogf(GL_FOG_START, -50.0f);                // ì•ˆê°œ ì‹œì‘ ê¹Šì´
+	glFogf(GL_FOG_END, 400.0f);                // ì•ˆê°œ ë ê¹Šì´
 	if (isFogDraw == true) {
-		glEnable(GL_FOG);                    // ¾È°³ ÄÔ
+		glEnable(GL_FOG);                    // ì•ˆê°œ ì¼¬
 
 	}
 
-	glEnable(GL_DEPTH_TEST);	//Àº¸éÁ¦°Å
-//	glEnable(GL_NORMALIZE);		//Á¤±ÔÈ­
-	glEnable(GL_SMOOTH);		//Á¤Á¡»ö»ó ºÎµå·´°Ô ¿¬°á. ±¸·Î¼ÎÀÌµù
-	glEnable(GL_LIGHTING);	//ºû¹Ş´Â °¢µµ¿¡ µû¶ó »ö»óº¯È­
-//	glDepthMask(GL_TRUE);	//µÚ¿¡ÀÖ´Â°Í ºÒÅõ¸í
-//	glEnable(GL_CULL_FACE);//ÈÄ¸éÁ¦°Å
+	glEnable(GL_DEPTH_TEST);	//ì€ë©´ì œê±°
+//	glEnable(GL_NORMALIZE);		//ì •ê·œí™”
+	glEnable(GL_SMOOTH);		//ì •ì ìƒ‰ìƒ ë¶€ë“œëŸ½ê²Œ ì—°ê²°. êµ¬ë¡œì…°ì´ë”©
+	glEnable(GL_LIGHTING);	//ë¹›ë°›ëŠ” ê°ë„ì— ë”°ë¼ ìƒ‰ìƒë³€í™”
+//	glDepthMask(GL_TRUE);	//ë’¤ì—ìˆëŠ”ê²ƒ ë¶ˆíˆ¬ëª…
+//	glEnable(GL_CULL_FACE);//í›„ë©´ì œê±°
 //	glCullFace(GL_BACK);		
 
-	glLightfv(GL_LIGHT0, GL_AMBIENT, ambi0);	//±¤¿ø0Á¤º¸ ¼ÂÆÃ
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambi0);	//ê´‘ì›0ì •ë³´ ì…‹íŒ…
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, diff0);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, spec0);
 	glLightfv(GL_LIGHT0, GL_POSITION, posi0);
 
-	glLightfv(GL_LIGHT1, GL_AMBIENT, ambi1);	//±¤¿ø1Á¤º¸ ¼ÂÆÃ
+	glLightfv(GL_LIGHT1, GL_AMBIENT, ambi1);	//ê´‘ì›1ì •ë³´ ì…‹íŒ…
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, diff1);
 	glLightfv(GL_LIGHT1, GL_SPECULAR, spec1);
 	glLightfv(GL_LIGHT1, GL_POSITION, posi1);
 
-	glLightfv(GL_LIGHT5, GL_AMBIENT, ambi5);	//±¤¿ø5Á¤º¸ ¼ÂÆÃ
+	glLightfv(GL_LIGHT5, GL_AMBIENT, ambi5);	//ê´‘ì›5ì •ë³´ ì…‹íŒ…
 	glLightfv(GL_LIGHT5, GL_DIFFUSE, diff5);
 	glLightfv(GL_LIGHT5, GL_SPECULAR, spec5);
 	glLightfv(GL_LIGHT5, GL_POSITION, posi5);
 
-	glLightfv(GL_LIGHT6, GL_AMBIENT, ambi5);	//±¤¿ø6Á¤º¸ ¼ÂÆÃ
+	glLightfv(GL_LIGHT6, GL_AMBIENT, ambi5);	//ê´‘ì›6ì •ë³´ ì…‹íŒ…
 	glLightfv(GL_LIGHT6, GL_DIFFUSE, diff5);
 	glLightfv(GL_LIGHT6, GL_SPECULAR, spec5);
 	glLightfv(GL_LIGHT6, GL_POSITION, posi5);
 
-	glEnable(GL_LIGHT0);			//Á¶¸í¹øÈ£0È°¼ºÈ­
-//	glEnable(GL_LIGHT1);			//Á¶¸í¹øÈ£1È°¼ºÈ­
+	glEnable(GL_LIGHT0);			//ì¡°ëª…ë²ˆí˜¸0í™œì„±í™”
+//	glEnable(GL_LIGHT1);			//ì¡°ëª…ë²ˆí˜¸1í™œì„±í™”
 
 	glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-	glMateriali(GL_FRONT, GL_SHININESS, 10);		//¹İ»çÁ¤µµ ÁöÁ¤
+	glMateriali(GL_FRONT, GL_SHININESS, 10);		//ë°˜ì‚¬ì •ë„ ì§€ì •
 	glEnable(GL_COLOR_MATERIAL);
 
-	//ÅØ½ºÆ® ¹à°Ô ÇÏ±â¿ë ±¤¿ø¼³Á¤
-	GLfloat ambientLight7[] = { 0.5f, 0.5f, 0.5f, 1.0f };//ÁÖº¯±¤
-	GLfloat diffuseLight7[] = { 0.5f, 0.5f, 0.5f, 1.0f };//È®»ê±¤
-//	GLfloat specular7[] = {1.0f, 1.0f, 1.0f, 1.0f};		//¹İ»ç±¤	
-	GLfloat specular7[] = { 0.1f, 0.1f, 0.1f, 0.1f };		//¹İ»ç±¤
-	GLfloat position7[] = { 10.0, 50.0, 50.0, 1.0 };	//±¤¿øÀ§Ä¡. x,y,z,°Å¸®
-	glLightfv(GL_LIGHT7, GL_AMBIENT, ambientLight7);	//±¤¿øÁ¤º¸ ¼ÂÆÃ. ÅØ½ºÆ® ¹à°Ô º¸ÀÌ°Ô ÇÏ±âÀ§ÇÔ
+	//í…ìŠ¤íŠ¸ ë°ê²Œ í•˜ê¸°ìš© ê´‘ì›ì„¤ì •
+	GLfloat ambientLight7[] = { 0.5f, 0.5f, 0.5f, 1.0f };//ì£¼ë³€ê´‘
+	GLfloat diffuseLight7[] = { 0.5f, 0.5f, 0.5f, 1.0f };//í™•ì‚°ê´‘
+//	GLfloat specular7[] = {1.0f, 1.0f, 1.0f, 1.0f};		//ë°˜ì‚¬ê´‘	
+	GLfloat specular7[] = { 0.1f, 0.1f, 0.1f, 0.1f };		//ë°˜ì‚¬ê´‘
+	GLfloat position7[] = { 10.0, 50.0, 50.0, 1.0 };	//ê´‘ì›ìœ„ì¹˜. x,y,z,ê±°ë¦¬
+	glLightfv(GL_LIGHT7, GL_AMBIENT, ambientLight7);	//ê´‘ì›ì •ë³´ ì…‹íŒ…. í…ìŠ¤íŠ¸ ë°ê²Œ ë³´ì´ê²Œ í•˜ê¸°ìœ„í•¨
 	glLightfv(GL_LIGHT7, GL_DIFFUSE, diffuseLight7);
 	glLightfv(GL_LIGHT7, GL_SPECULAR, specular7);
 	glLightfv(GL_LIGHT7, GL_POSITION, position7);
 
-	glEnable(GL_POINT_SMOOTH);//Á¡ ¿øÇüÀ¸·Î
-//    glEnable(GL_BLEND);		//ºí·»µå¸ğµå
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);	//ºí·»µå ¿É¼Ç
+	glEnable(GL_POINT_SMOOTH);//ì  ì›í˜•ìœ¼ë¡œ
+//    glEnable(GL_BLEND);		//ë¸”ë Œë“œëª¨ë“œ
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);	//ë¸”ë Œë“œ ì˜µì…˜
 
-	glEnable(GL_NORMALIZE);//¹ı¼± Á¤±ÔÈ­
+	glEnable(GL_NORMALIZE);//ë²•ì„  ì •ê·œí™”
 }
 
-//µğ½ºÇÃ·¹ÀÌ Äİ¹é
+//ë””ìŠ¤í”Œë ˆì´ ì½œë°±
 void MyDisplay() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -397,14 +397,14 @@ void MyDisplay() {
 	height = glutGet(GLUT_WINDOW_HEIGHT);
 	gluPerspective(60.0, (GLfloat)width / height, 0.01, 500.0);
 
-	// ¸¶¿ì½º ¿òÁ÷ÀÓ¿¡ µû¶ó ½ÃÁ¡º¯È­
+	// ë§ˆìš°ìŠ¤ ì›€ì§ì„ì— ë”°ë¼ ì‹œì ë³€í™”
 	gluLookAt(objs.EyeX, objs.EyeY, objs.EyeZ, objs.AtX, objs.AtY, objs.AtZ, 0.0, 1.0, 0.0);
 	//	printf("eyex = %f , eyey = %f , eyez = %f \n",(float)(ViewX - width/2.0)/width*10, (float)(height/2 - ViewY)/height*10, (float)ViewZ);
 
-	if (isHelpDraw == true) {//µµ¿ò¸» Ç¥½Ã. ÇÁ·ÎÁ§¼Ç Çà·Ä »ç¿ë
+	if (isHelpDraw == true) {//ë„ì›€ë§ í‘œì‹œ. í”„ë¡œì ì…˜ í–‰ë ¬ ì‚¬ìš©
 		RenderHelp();
 	}
-	if (objs.gameState == 4) {//µµ¿ò¸» Ç¥½Ã. ÇÁ·ÎÁ§¼Ç Çà·Ä »ç¿ë
+	if (objs.gameState == 4) {//ë„ì›€ë§ í‘œì‹œ. í”„ë¡œì ì…˜ í–‰ë ¬ ì‚¬ìš©
 		RenderEnd();
 	}
 
@@ -413,68 +413,68 @@ void MyDisplay() {
 
 	//	glDisable(GL_COLOR_MATERIAL);
 
-		//ÇÏ´Ã ±¸ ±×¸²
-	glDisable(GL_DEPTH_TEST);	//±íÀÌ¹öÆÛ ²û
-	glDisable(GL_CULL_FACE);//ÈÄ¸éÁ¦°Å ²û
-	glCallList(listID[2]);			//ÇÏ´Ã ±¸(¶óÀÌÇÁ¹Ù °¡¸®¸é ÄÑ°í ±×·Á¾ß)
-//	glEnable(GL_CULL_FACE);//ÈÄ¸éÁ¦°Å
+		//í•˜ëŠ˜ êµ¬ ê·¸ë¦¼
+	glDisable(GL_DEPTH_TEST);	//ê¹Šì´ë²„í¼ ë”
+	glDisable(GL_CULL_FACE);//í›„ë©´ì œê±° ë”
+	glCallList(listID[2]);			//í•˜ëŠ˜ êµ¬(ë¼ì´í”„ë°” ê°€ë¦¬ë©´ ì¼œê³  ê·¸ë ¤ì•¼)
+//	glEnable(GL_CULL_FACE);//í›„ë©´ì œê±°
 //	glEnable(GL_DEPTH_TEST);
 
 	if (mountainDrawMode == 0) {
-		glCallList(listID[4]);			//»ê
+		glCallList(listID[4]);			//ì‚°
 	}
 
-	glEnable(GL_DEPTH_TEST);	//±íÀÌ¹öÆÛ ÄÔ
+	glEnable(GL_DEPTH_TEST);	//ê¹Šì´ë²„í¼ ì¼¬
 
-	//	glCallList(listID[0]);			//Å¥ºê¹Ù´Ú
-	glCallList(listID[1]);			//ÅØ½ºÃ³ ¹Ù´Ú
+	//	glCallList(listID[0]);			//íë¸Œë°”ë‹¥
+	glCallList(listID[1]);			//í…ìŠ¤ì²˜ ë°”ë‹¥
 
 
-	if (treeDrawMode == 0) {//½Ç¸°´õ ³ª¹«µé ±×¸®±â
+	if (treeDrawMode == 0) {//ì‹¤ë¦°ë” ë‚˜ë¬´ë“¤ ê·¸ë¦¬ê¸°
 		DrawCylTree();
 	}
-	else if (treeDrawMode == 1) {//ÇÁ·¢Å» ³ª¹«µé ±×¸®±â
+	else if (treeDrawMode == 1) {//í”„ë™íƒˆ ë‚˜ë¬´ë“¤ ê·¸ë¦¬ê¸°
 		DrawFractalTree();
 	}
 
-	if (isCarDraw == true) {		//Â÷ ±×¸®±â
+	if (isCarDraw == true) {		//ì°¨ ê·¸ë¦¬ê¸°
 		glPushMatrix();
 		glTranslatef(car->pos.x, car->pos.y, car->pos.z);
 		glRotatef(car->angles.y + car->dAngle, 0, 1, 0);
-		glCallList(listID[10]);	//´Ü¼ø Â÷(Å¥ºê2°³)
+		glCallList(listID[10]);	//ë‹¨ìˆœ ì°¨(íë¸Œ2ê°œ)
 		glPopMatrix();
 	}
 
 
 
 
-	//	glutWireSphere(0.0, 5, 5);	//¹İ»çÃ¼.
+	//	glutWireSphere(0.0, 5, 5);	//ë°˜ì‚¬ì²´.
 
-	if (isAtDraw == TRUE) {//½Ã,ÃÊÁ¡ Ç¥½Ã
+	if (isAtDraw == TRUE) {//ì‹œ,ì´ˆì  í‘œì‹œ
 		glColor3f(255 / 255.0, 152 / 255.0, 10 / 255.0);
-		glutWireSphere(0.5, 20, 16);	//WCS¿øÁ¡¿¡ ºÓÀº ±¸ ±×¸². ¹İÁö¸§, °æ¼±, À§¼±
+		glutWireSphere(0.5, 20, 16);	//WCSì›ì ì— ë¶‰ì€ êµ¬ ê·¸ë¦¼. ë°˜ì§€ë¦„, ê²½ì„ , ìœ„ì„ 
 
 		glPushMatrix();
 		glTranslatef(objs.AtX, objs.AtY, objs.AtZ);
-		glColor3f(0.5, 0.9, 0.5);		//»ö¼³Á¤. ÃÊ·Ï»ö
-		glutWireSphere(0.5, 20, 16);	//WCS¿øÁ¡¿¡ ºÓÀº ±¸ ±×¸². ¹İÁö¸§, °æ¼±, À§¼±
+		glColor3f(0.5, 0.9, 0.5);		//ìƒ‰ì„¤ì •. ì´ˆë¡ìƒ‰
+		glutWireSphere(0.5, 20, 16);	//WCSì›ì ì— ë¶‰ì€ êµ¬ ê·¸ë¦¼. ë°˜ì§€ë¦„, ê²½ì„ , ìœ„ì„ 
 		glPopMatrix();
 	}
 
-	//ÆÄÆ¼Å¬ ±×¸²
-	glEnable(GL_BLEND);		//ºí·»µå È°¼º
+	//íŒŒí‹°í´ ê·¸ë¦¼
+	glEnable(GL_BLEND);		//ë¸”ë Œë“œ í™œì„±
 	for (int i = 0; i < MAX_PGENERATOR; i++) {
 		if (pGenerators[i].alive == true) {
 			pGenerators[i].DrawParticle();
 		}
 	}
-	glDisable(GL_BLEND);		//ºí·»µå ºñÈ°¼º
+	glDisable(GL_BLEND);		//ë¸”ë Œë“œ ë¹„í™œì„±
 
 
 	glDisable(GL_FOG);
 	if (isLifeBarDraw == true) {
-		//		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);	//´Ù¸¥»ö ¿µÇâ¾È¹Ş°Ô
-		DrawLifeBar();			//¶óÀÌÇÁ¹Ù Ç¥½Ã
+		//		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);	//ë‹¤ë¥¸ìƒ‰ ì˜í–¥ì•ˆë°›ê²Œ
+		DrawLifeBar();			//ë¼ì´í”„ë°” í‘œì‹œ
 //		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	}
 	if (isFogDraw == true) {
@@ -483,16 +483,16 @@ void MyDisplay() {
 
 	if (isPaused == false) {
 		angleX5 += 5;//glutGet(GLUT_ELAPSED_TIME)%360;
-		dir5[0] = cos(angleX5 * 3.14 / 180.0);	//Á¶¸í5¿ë ¹æÇâ
+		dir5[0] = cos(angleX5 * 3.14 / 180.0);	//ì¡°ëª…5ìš© ë°©í–¥
 		dir5[2] = sin(angleX5 * 3.14 / 180.0);
-		dir6[0] = -dir5[0];	//Á¶¸í6 ¹æÇâ
+		dir6[0] = -dir5[0];	//ì¡°ëª…6 ë°©í–¥
 		dir6[2] = -dir5[2];
 	}
 
 
 	//	GLfloat Emit[] = {1.0, 0.0, 0.0, 1.0};
-//	glMaterialfv(GL_FRONT, GL_EMISSION, Emit);		//¹°Ã¼Æ¯¼º ¼ÂÆÃ
-	//glMaterialfv(GL_FRONT, GL_AMBIENT, mAmbi);		//¹°Ã¼Æ¯¼º ¼ÂÆÃ
+//	glMaterialfv(GL_FRONT, GL_EMISSION, Emit);		//ë¬¼ì²´íŠ¹ì„± ì…‹íŒ…
+	//glMaterialfv(GL_FRONT, GL_AMBIENT, mAmbi);		//ë¬¼ì²´íŠ¹ì„± ì…‹íŒ…
 	//glMaterialfv(GL_FRONT, GL_DIFFUSE, mDiff);
 	//glMaterialfv(GL_FRONT, GL_SPECULAR, mSpec);
 	//glMaterialfv(GL_FRONT, GL_SPOT_DIRECTION, dir5);
@@ -502,12 +502,12 @@ void MyDisplay() {
 	//glMaterialfv(GL_EMISSION, GL_SHININESS, diff5);
 
 
-//	glLightfv(GL_LIGHT1, GL_POSITION, posi1);	//Á¶¸í1À§Ä¡º¯È­ ¼Â
+//	glLightfv(GL_LIGHT1, GL_POSITION, posi1);	//ì¡°ëª…1ìœ„ì¹˜ë³€í™” ì…‹
 
 	if (isCarDraw == true && isCyren == true) {
-		glEnable(GL_LIGHT5);			//Á¶¸í¹øÈ£5È°¼ºÈ­
-		glEnable(GL_LIGHT6);			//Á¶¸í¹øÈ£5È°¼ºÈ­
-		glPushMatrix();				//ºÓÀº±¤¿ø±¸(°æÂûÂ÷À§)
+		glEnable(GL_LIGHT5);			//ì¡°ëª…ë²ˆí˜¸5í™œì„±í™”
+		glEnable(GL_LIGHT6);			//ì¡°ëª…ë²ˆí˜¸5í™œì„±í™”
+		glPushMatrix();				//ë¶‰ì€ê´‘ì›êµ¬(ê²½ì°°ì°¨ìœ„)
 		glColor3f(1, 0.3, 0.3);
 		glTranslatef(posi5[0], posi5[1] - 0.5, posi5[2]);
 		glScalef(1, 2, 1);
@@ -517,57 +517,57 @@ void MyDisplay() {
 		posi5[0] = car->pos.x;
 		posi5[1] = car->pos.y + 4.5;
 		posi5[2] = car->pos.z;
-		glLightfv(GL_LIGHT5, GL_POSITION, posi5);//±¤¿ø5 ¼³Á¤
-		glLightfv(GL_LIGHT5, GL_SPOT_DIRECTION, dir5);//±¤¿ø ¼³Á¤
+		glLightfv(GL_LIGHT5, GL_POSITION, posi5);//ê´‘ì›5 ì„¤ì •
+		glLightfv(GL_LIGHT5, GL_SPOT_DIRECTION, dir5);//ê´‘ì› ì„¤ì •
 		glLightfv(GL_LIGHT5, GL_SPOT_CUTOFF, spotAngle5);
 		glLightf(GL_LIGHT5, GL_SPOT_EXPONENT, 1.0f);
-		glLightfv(GL_LIGHT6, GL_POSITION, posi5);//±¤¿ø6 ¼³Á¤
-		glLightfv(GL_LIGHT6, GL_SPOT_DIRECTION, dir6);//±¤¿ø ¼³Á¤
+		glLightfv(GL_LIGHT6, GL_POSITION, posi5);//ê´‘ì›6 ì„¤ì •
+		glLightfv(GL_LIGHT6, GL_SPOT_DIRECTION, dir6);//ê´‘ì› ì„¤ì •
 		glLightfv(GL_LIGHT6, GL_SPOT_CUTOFF, spotAngle5);
 		glLightf(GL_LIGHT6, GL_SPOT_EXPONENT, 1.0f);
 
-		//glLightfv(GL_LIGHT6, GL_POSITION, posi5);//±¤¿ø ¼³Á¤
-		//glLightfv(GL_LIGHT6, GL_SPOT_DIRECTION, dir5);//±¤¿ø ¼³Á¤
+		//glLightfv(GL_LIGHT6, GL_POSITION, posi5);//ê´‘ì› ì„¤ì •
+		//glLightfv(GL_LIGHT6, GL_SPOT_DIRECTION, dir5);//ê´‘ì› ì„¤ì •
 		//glLightfv(GL_LIGHT6, GL_SPOT_CUTOFF, spotAngle5);
 		//glLightf(GL_LIGHT6, GL_SPOT_EXPONENT, 1.0f);
 
 		glColor4f(1.0, 0, 0, 0.1);
-		cyl = gluNewQuadric();//¿ø»Ô
+		cyl = gluNewQuadric();//ì›ë¿”
 		glPushMatrix();
 		glTranslatef(posi5[0], posi5[1] - 0.1, posi5[2]);
-		glRotatef(-angleX5 + 90, 0, 1, 0);		//ºÓÀººû1
+		glRotatef(-angleX5 + 90, 0, 1, 0);		//ë¶‰ì€ë¹›1
 		glRotatef(0, 1, 0, 0);
 
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);	//ºí·»µå ¿É¼Ç
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);	//ë¸”ë Œë“œ ì˜µì…˜
 
 		gluCylinder(cyl, 0, 10, 100, 10, 10);
 
-		glRotatef(180, 0, 1, 0);				//ºÓÀººû2
+		glRotatef(180, 0, 1, 0);				//ë¶‰ì€ë¹›2
 		gluCylinder(cyl, 0, 10, 100, 10, 10);
 
 		glDisable(GL_BLEND);
 		glPopMatrix();
 	}
 	else {
-		glDisable(GL_LIGHT5);			//Á¶¸í¹øÈ£5ºñÈ°¼ºÈ­
-		glDisable(GL_LIGHT6);			//Á¶¸í¹øÈ£6ºñÈ°¼ºÈ­
+		glDisable(GL_LIGHT5);			//ì¡°ëª…ë²ˆí˜¸5ë¹„í™œì„±í™”
+		glDisable(GL_LIGHT6);			//ì¡°ëª…ë²ˆí˜¸6ë¹„í™œì„±í™”
 	}
 
 	//	glFlush();
-	glutSwapBuffers();	//´õºí¹öÆÛ¸µ
+	glutSwapBuffers();	//ë”ë¸”ë²„í¼ë§
 }
 
-//µğ½ºÇÃ·¹ÀÌ¸®½ºÆ®
+//ë””ìŠ¤í”Œë ˆì´ë¦¬ìŠ¤íŠ¸
 void Create_List() {
-	//Å×ÀÌºí ±×¸²
+	//í…Œì´ë¸” ê·¸ë¦¼
 	TableListID = glGenLists(1);
 	glNewList(TableListID, GL_COMPILE);
 	glPushMatrix();
 	glColor3f(0.5, 0.25, 0.0);
 	cyl = gluNewQuadric();
 	glRotatef(-90, 1.0, 0.0, 0.0);
-	gluCylinder(cyl, 0.2, 0.2, TableHeight, 10, 10); //±âµÕ1
+	gluCylinder(cyl, 0.2, 0.2, TableHeight, 10, 10); //ê¸°ë‘¥1
 	glPushMatrix();
 	cyl = gluNewQuadric();
 	glTranslatef(TableX, 0.0, 0.0);
@@ -583,8 +583,8 @@ void Create_List() {
 	glPushMatrix();
 	glTranslatef(TableX / 2.0, -TableY / 2, TableHeight);
 	glScalef(TableX + 0.5, TableY + 0.5, 0.5);
-	glutSolidCube(1);							//À§ÆÇ ±×¸®±â(À§3ÁÙºÎÅÍ)						
-	//glTranslatef(0.0, 0.0, TableHeight);//À§ÆÇÀ» Ã¤¿ò»ç°¢ÇüÀ¸·Î ±×¸®±â
+	glutSolidCube(1);							//ìœ„íŒ ê·¸ë¦¬ê¸°(ìœ„3ì¤„ë¶€í„°)						
+	//glTranslatef(0.0, 0.0, TableHeight);//ìœ„íŒì„ ì±„ì›€ì‚¬ê°í˜•ìœ¼ë¡œ ê·¸ë¦¬ê¸°
 	//glBegin(GL_QUADS);					
 	//	glVertex3f(-0.5, 0, 0);
 	//	glVertex3f(TableX+0.5, 0, 0);
@@ -593,7 +593,7 @@ void Create_List() {
 	//glEnd();
 	glPopMatrix();
 
-	glPushMatrix();							//»ï°¢»Ô1
+	glPushMatrix();							//ì‚¼ê°ë¿”1
 	glTranslatef(0, -TableY / 2, TableHeight);
 	glBegin(GL_TRIANGLES);
 	glColor3f(0.8, 0.9, 0.5);
@@ -610,7 +610,7 @@ void Create_List() {
 	glVertex3f(TableY / 16.0, TableY / 8.0, 0);
 	glVertex3f(0, TableY / 8.0, 0);
 	glEnd();
-	glPushMatrix();						//»ï°¢»Ô2
+	glPushMatrix();						//ì‚¼ê°ë¿”2
 	glTranslatef(TableX - TableY / 8.0, 0, 0);
 	glBegin(GL_TRIANGLES);
 	glColor3f(1.0, 0.0, 0.0);
@@ -647,7 +647,7 @@ void Create_List() {
 	glPopMatrix();
 	glEndList();
 
-	//Å¥ºê ¹Ù´Ú
+	//íë¸Œ ë°”ë‹¥
 	listID[0] = glGenLists(1);
 	glNewList(listID[0], GL_COMPILE);
 	glPushMatrix();
@@ -660,13 +660,13 @@ void Create_List() {
 	glPopMatrix();
 	glEndList();
 
-	//ÅØ½ºÃ³¹Ù´Ú
+	//í…ìŠ¤ì²˜ë°”ë‹¥
 	listID[1] = glGenLists(1);
 	glNewList(listID[1], GL_COMPILE);
-	//	    glEnable(GL_BLEND);		//ºí·»µå¸ğµå
-	//		glBlendFunc(GL_SRC_ALPHA, GL_ONE);	//ºí·»µå ¿É¼Ç
+	//	    glEnable(GL_BLEND);		//ë¸”ë Œë“œëª¨ë“œ
+	//		glBlendFunc(GL_SRC_ALPHA, GL_ONE);	//ë¸”ë Œë“œ ì˜µì…˜
 	glPushMatrix();
-	glBindTexture(GL_TEXTURE_2D, objs.textures[0]);	//µ¹±æ
+	glBindTexture(GL_TEXTURE_2D, objs.textures[0]);	//ëŒê¸¸
 
 	glColor4f(1, 1, 1, 1.0);
 	glTranslatef(0, 0, -300);
@@ -682,7 +682,7 @@ void Create_List() {
 	glPopMatrix();
 
 	glPushMatrix();
-	glBindTexture(GL_TEXTURE_2D, objs.textures[20]);	//¿ŞÇ®±æ
+	glBindTexture(GL_TEXTURE_2D, objs.textures[20]);	//ì™¼í’€ê¸¸
 
 	glTranslatef(-120, 0, -200);
 	for (int i = 0; i < 3; i++) {
@@ -697,7 +697,7 @@ void Create_List() {
 	glPopMatrix();
 
 	glPushMatrix();
-	glBindTexture(GL_TEXTURE_2D, objs.textures[20]);	//¿À¸¥Ç®±æ
+	glBindTexture(GL_TEXTURE_2D, objs.textures[20]);	//ì˜¤ë¥¸í’€ê¸¸
 
 	glTranslatef(120, 0, -200);
 	for (int i = 0; i < 3; i++) {
@@ -711,10 +711,10 @@ void Create_List() {
 	}
 	glPopMatrix();
 
-	glDisable(GL_BLEND);		//ºí·»µå ºñÈ°¼º
+	glDisable(GL_BLEND);		//ë¸”ë Œë“œ ë¹„í™œì„±
 	glEndList();
 
-	//ÇÏ´Ã±¸
+	//í•˜ëŠ˜êµ¬
 	listID[2] = glGenLists(1);
 	glNewList(listID[2], GL_COMPILE);
 	glPushMatrix();
@@ -728,53 +728,53 @@ void Create_List() {
 	cyl = gluNewQuadric();
 	gluQuadricTexture(cyl, 2);
 
-	gluSphere(cyl, 300, 50, 50);	//±¸
+	gluSphere(cyl, 300, 50, 50);	//êµ¬
 	glPopMatrix();
 	glEndList();
 
-	//ÇÁ·ºÅ» ³ª¹« 1°³
+	//í”„ë ‰íƒˆ ë‚˜ë¬´ 1ê°œ
 	listID[3] = glGenLists(1);
 	glNewList(listID[3], GL_COMPILE);
-	int fsrc = 0;		//ÇÁ·ºÅ» ¹è¿­¿¡¼­ ±×¸±À§Ä¡
-	int fdest = 1;	//ÇÁ·ºÅ» ¹è¿­¿¡¼­ ³ÖÀ»À§Ä¡
+	int fsrc = 0;		//í”„ë ‰íƒˆ ë°°ì—´ì—ì„œ ê·¸ë¦´ìœ„ì¹˜
+	int fdest = 1;	//í”„ë ‰íƒˆ ë°°ì—´ì—ì„œ ë„£ì„ìœ„ì¹˜
 //		Vec3<float> tempPos;
 //		float mat[16];
 	cyl = gluNewQuadric();
 
 	glPushMatrix();
-	leafs[0].pos.set(0.0f, 0.0f, 0.0f);		//Ã¹ ¿øÅë ¼ÂÆÃ
+	leafs[0].pos.set(0.0f, 0.0f, 0.0f);		//ì²« ì›í†µ ì…‹íŒ…
 	leafs[0].angle.set(0.0f, 0.0f, 0.0f);
 	leafs[0].height = 4.0f;
 	leafs[0].radius = 0.5f;
-	glRotatef(-90, 1, 0, 0);				//¼¼¿ö ±×·ÁÁö°Ô
-	glScalef(2, 2, 2);				//´Ã¸²
+	glRotatef(-90, 1, 0, 0);				//ì„¸ì›Œ ê·¸ë ¤ì§€ê²Œ
+	glScalef(2, 2, 2);				//ëŠ˜ë¦¼
 
-	glColor3f(236 / 255.0, 77 / 255.0, 0 / 255.0);//°¥»ö
-	gluCylinder(cyl, leafs[0].radius, leafs[0].radius, leafs[0].height, 10, 5);//Ã¹ ¿øÅë ±×¸²
-	glTranslatef(0, 0, 2);				//À§¿¡¼­ ±×·ÁÁö°Ô
+	glColor3f(236 / 255.0, 77 / 255.0, 0 / 255.0);//ê°ˆìƒ‰
+	gluCylinder(cyl, leafs[0].radius, leafs[0].radius, leafs[0].height, 10, 5);//ì²« ì›í†µ ê·¸ë¦¼
+	glTranslatef(0, 0, 2);				//ìœ„ì—ì„œ ê·¸ë ¤ì§€ê²Œ
 
 	for (int i = 0; i < 10000; i++) {
 		glPushMatrix();
 		glTranslatef(leafs[fsrc].pos.x, leafs[fsrc].pos.y, leafs[fsrc].pos.z);
 		glRotatef(leafs[fsrc].angle.z, 0, 0, 1);
 		glRotatef(leafs[fsrc].angle.y, 0, 1, 0);
-		glRotatef(leafs[fsrc].angle.x, 1, 0, 0);//¼Ò½º À§Ä¡·Î ÀÌµ¿/È¸Àü
+		glRotatef(leafs[fsrc].angle.x, 1, 0, 0);//ì†ŒìŠ¤ ìœ„ì¹˜ë¡œ ì´ë™/íšŒì „
 
 		for (int j = 0; j < 3; j++) {
 			glPushMatrix();
-			leafs[fdest].angle.set(leafs[fsrc].angle.x + random(-50.0, 50.0), leafs[fsrc].angle.y + random(-50.0, 50.0), leafs[fsrc].angle.z);//¼Ò½º¿¡¼­ °¢µµ·£´ı¼Â
+			leafs[fdest].angle.set(leafs[fsrc].angle.x + random(-50.0, 50.0), leafs[fsrc].angle.y + random(-50.0, 50.0), leafs[fsrc].angle.z);//ì†ŒìŠ¤ì—ì„œ ê°ë„ëœë¤ì…‹
 			leafs[fdest].pos.set(0, 0, leafs[fsrc].height * 2 / 3);
-			leafs[fdest].height = leafs[fsrc].height * 2.5 / 3.0;	//³ôÀÌº¯È­
-			leafs[fdest].radius = leafs[fsrc].radius * 2 / 3.0;	//Å©±âº¯È­
+			leafs[fdest].height = leafs[fsrc].height * 2.5 / 3.0;	//ë†’ì´ë³€í™”
+			leafs[fdest].radius = leafs[fsrc].radius * 2 / 3.0;	//í¬ê¸°ë³€í™”
 
 			glTranslatef(leafs[fdest].pos.x, leafs[fdest].pos.y, leafs[fdest].pos.z);
 			glRotatef(leafs[fdest].angle.z, 0, 0, 1);
 			glRotatef(leafs[fdest].angle.y, 0, 1, 0);
-			glRotatef(leafs[fdest].angle.x, 1, 0, 0);//¼Ò½º À§Ä¡·Î ÀÌµ¿/È¸Àü	
-			glColor3f(100 / 255.0, 200 / 255.0, 100 / 255.0);//ÃÊ·Ï»ö
+			glRotatef(leafs[fdest].angle.x, 1, 0, 0);//ì†ŒìŠ¤ ìœ„ì¹˜ë¡œ ì´ë™/íšŒì „	
+			glColor3f(100 / 255.0, 200 / 255.0, 100 / 255.0);//ì´ˆë¡ìƒ‰
 
-			if (leafs[fdest].radius < 0.1) {	//ÀÙ Å©±â Á¦ÇÑ. ³ÑÀ¸¸é ¾È±×¸²
-				gluCylinder(cyl, leafs[fdest].radius, leafs[fdest].radius, leafs[fdest].height, 3, 3);//Ã¹ ¿øÅë ±×¸²
+			if (leafs[fdest].radius < 0.1) {	//ì í¬ê¸° ì œí•œ. ë„˜ìœ¼ë©´ ì•ˆê·¸ë¦¼
+				gluCylinder(cyl, leafs[fdest].radius, leafs[fdest].radius, leafs[fdest].height, 3, 3);//ì²« ì›í†µ ê·¸ë¦¼
 			}
 
 			fdest++;
@@ -786,7 +786,7 @@ void Create_List() {
 	glPopMatrix();
 	glEndList();
 
-	//´Ü¼ø »ê
+	//ë‹¨ìˆœ ì‚°
 	listID[4] = glGenLists(1);
 	glNewList(listID[4], GL_COMPILE);
 	float tcos;
@@ -794,49 +794,49 @@ void Create_List() {
 	float ran;
 	glColor3f(0.3, 1, 0.3);
 	for (int i = 0; i < 360; i += 15 + ran) {
-		ran = rand() % 10;		//³­¼ö
+		ran = rand() % 10;		//ë‚œìˆ˜
 		tcos = cos(i * pi / 180.0);
 		tsin = sin(i * pi / 180.0);
 
 		glPushMatrix();
 		glTranslatef(tsin * -250, 0, tcos * -250);
 		glScalef(40 + ran * 6, 40 + ran * 6, 40 + ran * 6);
-		//				glutSolidDodecahedron();	//12¸é
-		glutSolidIcosahedron();	//20¸é
+		//				glutSolidDodecahedron();	//12ë©´
+		glutSolidIcosahedron();	//20ë©´
 		glPopMatrix();
 	}
 
 	glEndList();
 
-	//½Ç¸°´õ ³ª¹« 1°³
+	//ì‹¤ë¦°ë” ë‚˜ë¬´ 1ê°œ
 	listID[5] = glGenLists(1);
 	glNewList(listID[5], GL_COMPILE);
 	cyl = gluNewQuadric();
-	glColor3f(236 / 255.0, 77 / 255.0, 0 / 255.0);//°¥»ö
+	glColor3f(236 / 255.0, 77 / 255.0, 0 / 255.0);//ê°ˆìƒ‰
 
-	glBindTexture(GL_TEXTURE_2D, objs.textures[20]);			//ÀÙ1
+	glBindTexture(GL_TEXTURE_2D, objs.textures[20]);			//ì1
 	//	glTexGeni(GL_Q, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
 	gluQuadricTexture(cyl, 2);
 
 	glPushMatrix();
 	glRotatef(-90, 1, 0, 0);
-	gluCylinder(cyl, 0.5, 0.5, 6, 5, 5);	//±âµÕ		
+	gluCylinder(cyl, 0.5, 0.5, 6, 5, 5);	//ê¸°ë‘¥		
 
-	glColor3f(100 / 255.0, 200 / 255.0, 100 / 255.0);//ÃÊ·Ï»ö
+	glColor3f(100 / 255.0, 200 / 255.0, 100 / 255.0);//ì´ˆë¡ìƒ‰
 	glTranslatef(0, 0, 3);
-	gluCylinder(cyl, 3, 0.2, 6.0, 8, 8);	//ÀÙ
+	gluCylinder(cyl, 3, 0.2, 6.0, 8, 8);	//ì
 	glTranslatef(0, 0, 2);
-	gluCylinder(cyl, 3, 0.2, 6.0, 8, 8);	//ÀÙ
+	gluCylinder(cyl, 3, 0.2, 6.0, 8, 8);	//ì
 	glTranslatef(0, 0, 2);
-	gluCylinder(cyl, 3, 0.2, 6.0, 8, 8);	//ÀÙ
+	gluCylinder(cyl, 3, 0.2, 6.0, 8, 8);	//ì
 	glPopMatrix();
-	glBindTexture(GL_TEXTURE_2D, 0);			//ÅØ½ºÃ³ ¾ø¾Ú
+	glBindTexture(GL_TEXTURE_2D, 0);			//í…ìŠ¤ì²˜ ì—†ì•°
 	glEndList();
 
-	//´Ü¼ø Â÷
+	//ë‹¨ìˆœ ì°¨
 	listID[10] = glGenLists(1);
 	glNewList(listID[10], GL_COMPILE);
-	glBindTexture(GL_TEXTURE_2D, 0);	//ÅØ½ºÃ³ ¾ø¾Ú
+	glBindTexture(GL_TEXTURE_2D, 0);	//í…ìŠ¤ì²˜ ì—†ì•°
 	glColor4f(0.5, 0.5, 0.5, 0.5);
 	glPushMatrix();
 	glTranslatef(0, 1.5, 0);
@@ -857,12 +857,12 @@ void Create_List() {
 	glEndList();
 }
 
-//ÇÁ·¢Å» Æ®¸®µé ±×¸®±â
+//í”„ë™íƒˆ íŠ¸ë¦¬ë“¤ ê·¸ë¦¬ê¸°
 void DrawFractalTree() {
 	glPushMatrix();
 	glTranslatef(-30, 0, 0);
 	for (int i = 0; i < 7; i++) {
-		glCallList(listID[3]);			//ÇÁ·ºÅ» ³ª¹«
+		glCallList(listID[3]);			//í”„ë ‰íƒˆ ë‚˜ë¬´
 		glTranslatef(0, 0, -10);
 	}
 	glPopMatrix();
@@ -870,482 +870,482 @@ void DrawFractalTree() {
 	glPushMatrix();
 	glTranslatef(30, 0, 0);
 	for (int i = 0; i < 7; i++) {
-		glCallList(listID[3]);			//ÇÁ·ºÅ» ³ª¹«
+		glCallList(listID[3]);			//í”„ë ‰íƒˆ ë‚˜ë¬´
 		glTranslatef(0, 0, -10);
 	}
 	glPopMatrix();
 }
 
-//½Ç¸°´õ Æ®¸®µé ±×¸®±â
+//ì‹¤ë¦°ë” íŠ¸ë¦¬ë“¤ ê·¸ë¦¬ê¸°
 void DrawCylTree() {
-	glPushMatrix();				//¿À¸¥ÂÊ
+	glPushMatrix();				//ì˜¤ë¥¸ìª½
 	glTranslatef(30, 0, 300);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -30);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ2
+	glPushMatrix();				//ì˜¤ë¥¸ìª½2
 	glTranslatef(35, 0, 297.5);
 	for (int i = 0; i < 33; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -16);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ3
+	glPushMatrix();				//ì˜¤ë¥¸ìª½3
 	glTranslatef(40, 0, 295);
 	for (int i = 0; i < 33; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -8);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ4
+	glPushMatrix();				//ì˜¤ë¥¸ìª½4
 	glTranslatef(45, 0, 292.5);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -27);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ5
+	glPushMatrix();				//ì˜¤ë¥¸ìª½5
 	glTranslatef(50, 0, 290);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -22);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ6
+	glPushMatrix();				//ì˜¤ë¥¸ìª½6
 	glTranslatef(55, 0, 287.5);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -18);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ7
+	glPushMatrix();				//ì˜¤ë¥¸ìª½7
 	glTranslatef(60, 0, 285);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -30);
 	}
 	glPopMatrix();
 	glPopMatrix();
 
-	glPushMatrix();				//¿À¸¥ÂÊ9
+	glPushMatrix();				//ì˜¤ë¥¸ìª½9
 	glTranslatef(70, 0, 280);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -8);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ10
+	glPushMatrix();				//ì˜¤ë¥¸ìª½10
 	glTranslatef(75, 0, 277.5);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -27);
 	}
 	glPopMatrix();
 	glPopMatrix();
 
-	glPushMatrix();				//¿À¸¥ÂÊ12
+	glPushMatrix();				//ì˜¤ë¥¸ìª½12
 	glTranslatef(85, 0, 272.5);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -18);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ13
+	glPushMatrix();				//ì˜¤ë¥¸ìª½13
 	glTranslatef(90, 0, 270);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -30);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ14
+	glPushMatrix();				//ì˜¤ë¥¸ìª½14
 	glTranslatef(95, 0, 267.5);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -16);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ15
+	glPushMatrix();				//ì˜¤ë¥¸ìª½15
 	glTranslatef(100, 0, 265);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -8);
 	}
 	glPopMatrix();
 
-	glPushMatrix();				//¿À¸¥ÂÊ17
+	glPushMatrix();				//ì˜¤ë¥¸ìª½17
 	glTranslatef(110, 0, 260);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -22);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ18
+	glPushMatrix();				//ì˜¤ë¥¸ìª½18
 	glTranslatef(115, 0, 257.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -18);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ19
+	glPushMatrix();				//ì˜¤ë¥¸ìª½19
 	glTranslatef(120, 0, 255);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -30);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ20
+	glPushMatrix();				//ì˜¤ë¥¸ìª½20
 	glTranslatef(130, 0, 250);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -16);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ21
+	glPushMatrix();				//ì˜¤ë¥¸ìª½21
 	glTranslatef(135, 0, 247.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -8);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ22
+	glPushMatrix();				//ì˜¤ë¥¸ìª½22
 	glTranslatef(140, 0, 245);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -22);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ23
+	glPushMatrix();				//ì˜¤ë¥¸ìª½23
 	glTranslatef(145, 0, 242.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -18);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ24
+	glPushMatrix();				//ì˜¤ë¥¸ìª½24
 	glTranslatef(150, 0, 240);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -30);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ25
+	glPushMatrix();				//ì˜¤ë¥¸ìª½25
 	glTranslatef(160, 0, 237.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -16);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ26
+	glPushMatrix();				//ì˜¤ë¥¸ìª½26
 	glTranslatef(165, 0, 235);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -8);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ27
+	glPushMatrix();				//ì˜¤ë¥¸ìª½27
 	glTranslatef(170, 0, 232.5);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -27);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ28
+	glPushMatrix();				//ì˜¤ë¥¸ìª½28
 	glTranslatef(175, 0, 230);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -22);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ29
+	glPushMatrix();				//ì˜¤ë¥¸ìª½29
 	glTranslatef(180, 0, 227.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -18);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ30
+	glPushMatrix();				//ì˜¤ë¥¸ìª½30
 	glTranslatef(190, 0, 225);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -30);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ31
+	glPushMatrix();				//ì˜¤ë¥¸ìª½31
 	glTranslatef(195, 0, 222.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -16);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ32
+	glPushMatrix();				//ì˜¤ë¥¸ìª½32
 	glTranslatef(200, 0, 220);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -8);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ33
+	glPushMatrix();				//ì˜¤ë¥¸ìª½33
 	glTranslatef(205, 0, 217.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -27);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿À¸¥ÂÊ34
+	glPushMatrix();				//ì˜¤ë¥¸ìª½34
 	glTranslatef(205, 0, 215.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -30);
 	}
 	glPopMatrix();
 
-	glPushMatrix();				//¿ŞÂÊ
+	glPushMatrix();				//ì™¼ìª½
 	glTranslatef(-30, 0, 300);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -30);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ2
+	glPushMatrix();				//ì™¼ìª½2
 	glTranslatef(-35, 0, 297.5);
 	for (int i = 0; i < 33; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -35);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ3
+	glPushMatrix();				//ì™¼ìª½3
 	glTranslatef(-40, 0, 295);
 	for (int i = 0; i < 33; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -8);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ4
+	glPushMatrix();				//ì™¼ìª½4
 	glTranslatef(-45, 0, 292.5);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -27);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ5
+	glPushMatrix();				//ì™¼ìª½5
 	glTranslatef(-50, 0, 290);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -22);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ6
+	glPushMatrix();				//ì™¼ìª½6
 	glTranslatef(-55, 0, 287.5);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -18);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ7
+	glPushMatrix();				//ì™¼ìª½7
 	glTranslatef(-60, 0, 285);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -30);
 	}
 	glPopMatrix();
 	glPopMatrix();
 
-	glPushMatrix();				//¿ŞÂÊ9
+	glPushMatrix();				//ì™¼ìª½9
 	glTranslatef(-70, 0, 280);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -8);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ10
+	glPushMatrix();				//ì™¼ìª½10
 	glTranslatef(-75, 0, 277.5);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -27);
 	}
 	glPopMatrix();
 	glPopMatrix();
 
-	glPushMatrix();				//¿ŞÂÊ12
+	glPushMatrix();				//ì™¼ìª½12
 	glTranslatef(-85, 0, 272.5);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -18);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ13
+	glPushMatrix();				//ì™¼ìª½13
 	glTranslatef(-90, 0, 270);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -30);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ14
+	glPushMatrix();				//ì™¼ìª½14
 	glTranslatef(-95, 0, 267.5);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -16);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ15
+	glPushMatrix();				//ì™¼ìª½15
 	glTranslatef(-100, 0, 265);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -8);
 	}
 	glPopMatrix();
 
-	glPushMatrix();				//¿ŞÂÊ17
+	glPushMatrix();				//ì™¼ìª½17
 	glTranslatef(-110, 0, 260);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -22);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ18
+	glPushMatrix();				//ì™¼ìª½18
 	glTranslatef(-115, 0, 257.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -18);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ19
+	glPushMatrix();				//ì™¼ìª½19
 	glTranslatef(-120, 0, 255);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -30);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ20
+	glPushMatrix();				//ì™¼ìª½20
 	glTranslatef(-130, 0, 250);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -16);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ21
+	glPushMatrix();				//ì™¼ìª½21
 	glTranslatef(-135, 0, 247.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -8);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ22
+	glPushMatrix();				//ì™¼ìª½22
 	glTranslatef(-140, 0, 245);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -20);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ23
+	glPushMatrix();				//ì™¼ìª½23
 	glTranslatef(-145, 0, 242.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -10);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ24
+	glPushMatrix();				//ì™¼ìª½24
 	glTranslatef(-150, 0, 240);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -15);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ25
+	glPushMatrix();				//ì™¼ìª½25
 	glTranslatef(-160, 0, 237.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -20);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ26
+	glPushMatrix();				//ì™¼ìª½26
 	glTranslatef(-165, 0, 235);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -8);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ27
+	glPushMatrix();				//ì™¼ìª½27
 	glTranslatef(-170, 0, 232.5);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -27);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ28
+	glPushMatrix();				//ì™¼ìª½28
 	glTranslatef(-175, 0, 230);
 	for (int i = 0; i < 20; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -22);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ29
+	glPushMatrix();				//ì™¼ìª½29
 	glTranslatef(-180, 0, 227.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -18);
 	}
 	glPopMatrix();
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ30
+	glPushMatrix();				//ì™¼ìª½30
 	glTranslatef(-190, 0, 225);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -20);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ31
+	glPushMatrix();				//ì™¼ìª½31
 	glTranslatef(-195, 0, 222.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -16);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ32
+	glPushMatrix();				//ì™¼ìª½32
 	glTranslatef(-200, 0, 220);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -10);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ33
+	glPushMatrix();				//ì™¼ìª½33
 	glTranslatef(-205, 0, 217.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -27);
 	}
 	glPopMatrix();
-	glPushMatrix();				//¿ŞÂÊ34
+	glPushMatrix();				//ì™¼ìª½34
 	glTranslatef(-205, 0, 215.5);
 	for (int i = 0; i < 18; i++) {
-		glCallList(listID[5]);//½Ç¸°´õ ³ª¹«
+		glCallList(listID[5]);//ì‹¤ë¦°ë” ë‚˜ë¬´
 		glTranslatef(0, 0, -30);
 	}
 	glPopMatrix();
@@ -1358,7 +1358,7 @@ void DrawBoards() {
 	glPopMatrix();
 }
 
-//Å°º¸µåÄİ¹é
+//í‚¤ë³´ë“œì½œë°±
 void MyKeyboard(unsigned char key, int x, int y)
 {
 	//	printf("key = %d \n",key);
@@ -1367,7 +1367,7 @@ void MyKeyboard(unsigned char key, int x, int y)
 	case 'q': case 'Q': case '\033':
 		exit(0);
 		break;
-	case 't': case 'T':		//ÇÃ·§½¦ÀÌµù, ±¸·Î½¦ÀÌµù Åä±Û¸µ
+	case 't': case 'T':		//í”Œë«ì‰ì´ë”©, êµ¬ë¡œì‰ì´ë”© í† ê¸€ë§
 		if (FlatShaded) {
 			FlatShaded = 0;
 			glShadeModel(GL_SMOOTH);
@@ -1377,7 +1377,7 @@ void MyKeyboard(unsigned char key, int x, int y)
 			glShadeModel(GL_FLAT);
 		}
 		break;
-	case 'r': case 'R':	//¿ÍÀÌ¾îÇÁ·¹ÀÓ Åä±Û¸µ
+	case 'r': case 'R':	//ì™€ì´ì–´í”„ë ˆì„ í† ê¸€ë§
 		if (Wireframed) {
 			Wireframed = 0;
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -1387,16 +1387,16 @@ void MyKeyboard(unsigned char key, int x, int y)
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		}
 		break;
-	case 52:		//pad ¡ç
+	case 52:		//pad â†
 		objs.AtX -= .5;
 		break;
-	case 56:		//pad ¡è
+	case 56:		//pad â†‘
 		objs.AtY += .5;
 		break;
-	case 54:		//pad ¡æ
+	case 54:		//pad â†’
 		objs.AtX += .5;
 		break;
-	case 50:		//pad ¡é
+	case 50:		//pad â†“
 		objs.AtY -= .5;
 		break;
 	case 43:		//pad +
@@ -1411,42 +1411,42 @@ void MyKeyboard(unsigned char key, int x, int y)
 	case 46:		//pad .
 		objs.EyeZ -= 1;
 		break;
-	case 'z': case 'Z':					//ÁÜÀÎ
+	case 'z': case 'Z':					//ì¤Œì¸
 		objs.EyeX = objs.EyeX + 0.1 * (objs.AtX - objs.EyeX);
 		objs.EyeY = objs.EyeY + 0.1 * (objs.AtY - objs.EyeY);
 		objs.EyeZ = objs.EyeZ + 0.1 * (objs.AtZ - objs.EyeZ);
 		break;
-	case 'x': case 'X':					//ÁÜ¾Æ¿ô
+	case 'x': case 'X':					//ì¤Œì•„ì›ƒ
 		objs.EyeX = objs.EyeX - 0.1 * (objs.AtX - objs.EyeX);
 		objs.EyeY = objs.EyeY - 0.1 * (objs.AtY - objs.EyeY);
 		objs.EyeZ = objs.EyeZ - 0.1 * (objs.AtZ - objs.EyeZ);
 		break;
-	case 'f': case 'F':					//¾È°³¸ğµåº¯°æ
+	case 'f': case 'F':					//ì•ˆê°œëª¨ë“œë³€ê²½
 		if (isFogDraw == false) {
 			isFogDraw = true;
-			glEnable(GL_FOG);		//¾È°³ ÄÔ
+			glEnable(GL_FOG);		//ì•ˆê°œ ì¼¬
 		}
 		else {
 			isFogDraw = false;
-			glDisable(GL_FOG);	//¾È°³ ²û
+			glDisable(GL_FOG);	//ì•ˆê°œ ë”
 		}
 		//fogFilter++;
 		//if(fogFilter == 1){
-		//	glDisable(GL_FOG);	//¾È°³ ²û
+		//	glDisable(GL_FOG);	//ì•ˆê°œ ë”
 		//}else if(fogFilter > 1){
 		//	fogFilter = 0;
-		//	glFogi (GL_FOG_MODE, fogMode[fogFilter]);	//¾È°³Àû¿ë
-		//	glEnable(GL_FOG);		//¾È°³ ÄÔ
+		//	glFogi (GL_FOG_MODE, fogMode[fogFilter]);	//ì•ˆê°œì ìš©
+		//	glEnable(GL_FOG);		//ì•ˆê°œ ì¼¬
 		//}
 
 		break;
-	case 'g': case 'G':					//Æ®¸® ±×¸®±â ¸ğµå Åä±Û
+	case 'g': case 'G':					//íŠ¸ë¦¬ ê·¸ë¦¬ê¸° ëª¨ë“œ í† ê¸€
 		treeDrawMode = ++treeDrawMode % 3;
 		break;
-	case 'v': case 'V':					//»ê ±×¸®±â ¸ğµå 0:´Ü¼ø   1:¾È±×¸²
+	case 'v': case 'V':					//ì‚° ê·¸ë¦¬ê¸° ëª¨ë“œ 0:ë‹¨ìˆœ   1:ì•ˆê·¸ë¦¼
 		mountainDrawMode = ++mountainDrawMode % 2;
 		break;
-	case 'c': case 'C':					//ÆÄÆ¼Å¬ ±×¸®³ª Åä±Û
+	case 'c': case 'C':					//íŒŒí‹°í´ ê·¸ë¦¬ë‚˜ í† ê¸€
 		if (isParticleDraw == false) {
 			isParticleDraw = true;
 		}
@@ -1454,31 +1454,31 @@ void MyKeyboard(unsigned char key, int x, int y)
 			isParticleDraw = false;
 		}
 		break;
-	case 'n': case 'N':					//½ÃÁ¡ÀÌ ¿øÁ¡¿¡ °¡±î¿öÁö°Ô
+	case 'n': case 'N':					//ì‹œì ì´ ì›ì ì— ê°€ê¹Œì›Œì§€ê²Œ
 		objs.EyeX = objs.EyeX + 0.1 * (-objs.EyeX);
 		objs.EyeY = objs.EyeY + 0.1 * (-objs.EyeY);
 		objs.EyeZ = objs.EyeZ + 0.1 * (-objs.EyeZ);
 		break;
-	case 'm': case 'M':					//½ÃÁ¡ÀÌ ¿øÁ¡¿¡¼­ ¸Ö¾îÁö°Ô
+	case 'm': case 'M':					//ì‹œì ì´ ì›ì ì—ì„œ ë©€ì–´ì§€ê²Œ
 		objs.EyeX = objs.EyeX - 0.1 * (-objs.EyeX);
 		objs.EyeY = objs.EyeY - 0.1 * (-objs.EyeY);
 		objs.EyeZ = objs.EyeZ - 0.1 * (-objs.EyeZ);
 		break;
-	case 'p': case 'P':					//ÀÏ½ÃÁ¤Áö º¯¼ö ÄÁÆ®·Ñ
+	case 'p': case 'P':					//ì¼ì‹œì •ì§€ ë³€ìˆ˜ ì»¨íŠ¸ë¡¤
 		if (isPaused == FALSE) {
 			isPaused = TRUE;
-			for (int i = 0; i < MAX_ANINUM; i++) {	//½º·¹µå ÀÏ½ÃÁ¤Áö
+			for (int i = 0; i < MAX_ANINUM; i++) {	//ìŠ¤ë ˆë“œ ì¼ì‹œì •ì§€
 				SuspendThread(Thread[i]);
 			}
 		}
 		else {
 			isPaused = FALSE;
-			for (int i = 0; i < MAX_ANINUM; i++) {	//½º·¹µå ¼ÓÇà
+			for (int i = 0; i < MAX_ANINUM; i++) {	//ìŠ¤ë ˆë“œ ì†í–‰
 				ResumeThread(Thread[i]);
 			}
 		}
 		break;
-	case 'e': case 'E':					//ÃÊÁ¡, Àü¿ªÁÂÇ¥°è ¿øÁ¡ ±×¸®±â Åä±Û
+	case 'e': case 'E':					//ì´ˆì , ì „ì—­ì¢Œí‘œê³„ ì›ì  ê·¸ë¦¬ê¸° í† ê¸€
 		if (isAtDraw == FALSE) {
 			isAtDraw = TRUE;
 		}
@@ -1486,25 +1486,25 @@ void MyKeyboard(unsigned char key, int x, int y)
 			isAtDraw = FALSE;
 		}
 		break;
-	case 'h': case 'H':					//µµ¿ò¸» ON/OFF
+	case 'h': case 'H':					//ë„ì›€ë§ ON/OFF
 		if (isHelpDraw == false) {
 			isHelpDraw = true;
-			glDisable(GL_FOG);		//¾È°³ ÄÔ
+			glDisable(GL_FOG);		//ì•ˆê°œ ì¼¬
 		}
 		else {
 			isHelpDraw = false;
 			if (isFogDraw == true) {
-				glEnable(GL_FOG);		//¾È°³ ÄÔ
+				glEnable(GL_FOG);		//ì•ˆê°œ ì¼¬
 			}
 		}
 		break;
-	case 93:						//] Å° ´©¸¦½Ã, ÇÁ·¹ÀÓ Áö¿¬½Ã°£ °¨¼Ò(¾Ö´Ï¸ÅÀÌ¼Ç ºü¸£°Ô)
+	case 93:						//] í‚¤ ëˆ„ë¥¼ì‹œ, í”„ë ˆì„ ì§€ì—°ì‹œê°„ ê°ì†Œ(ì• ë‹ˆë§¤ì´ì…˜ ë¹ ë¥´ê²Œ)
 		sleepSpeed -= 17;
 		if (sleepSpeed < 17) {
 			sleepSpeed = 17;
 		}
 		break;
-	case 91:						//[ Å° ´©¸¦½Ã, ÇÁ·¹ÀÓ Áö¿¬½Ã°£ Áõ°¡(¾Ö´Ï¸ÅÀÌ¼Ç ´À¸®°Ô)
+	case 91:						//[ í‚¤ ëˆ„ë¥¼ì‹œ, í”„ë ˆì„ ì§€ì—°ì‹œê°„ ì¦ê°€(ì• ë‹ˆë§¤ì´ì…˜ ëŠë¦¬ê²Œ)
 		sleepSpeed += 17;
 		if (sleepSpeed > 200) {
 			sleepSpeed = 200;
@@ -1515,26 +1515,26 @@ void MyKeyboard(unsigned char key, int x, int y)
 	case 'a': case 'A':
 		objs.people.at(0)->keyHold[1] = 1;
 		if (objs.people.at(0)->keyDoubleTouchLevel[1] % 2 == 0) {
-			objs.people.at(0)->keyDoubleTouch[1] = keyDoubleTouchTime;	//Å° ´õºíÀÔ·Â °¨Áö¿ë ¹è¿­ ¼³Á¤
+			objs.people.at(0)->keyDoubleTouch[1] = keyDoubleTouchTime;	//í‚¤ ë”ë¸”ì…ë ¥ ê°ì§€ìš© ë°°ì—´ ì„¤ì •
 			objs.people.at(0)->keyDoubleTouchLevel[1]++;
 		}
 		break;
 	case 's': case 'S':
 		objs.people.at(0)->keyHold[2] = 1;
 		if (objs.people.at(0)->keyDoubleTouchLevel[2] % 2 == 0) {
-			objs.people.at(0)->keyDoubleTouch[2] = keyDoubleTouchTime;	//Å° ´õºíÀÔ·Â °¨Áö¿ë ¹è¿­ ¼³Á¤
+			objs.people.at(0)->keyDoubleTouch[2] = keyDoubleTouchTime;	//í‚¤ ë”ë¸”ì…ë ¥ ê°ì§€ìš© ë°°ì—´ ì„¤ì •
 			objs.people.at(0)->keyDoubleTouchLevel[2]++;
 		}
 		break;
 	case 'd': case 'D':
 		objs.people.at(0)->keyHold[3] = 1;
 		if (objs.people.at(0)->keyDoubleTouchLevel[3] % 2 == 0) {
-			objs.people.at(0)->keyDoubleTouch[3] = keyDoubleTouchTime;	//Å° ´õºíÀÔ·Â °¨Áö¿ë ¹è¿­ ¼³Á¤
+			objs.people.at(0)->keyDoubleTouch[3] = keyDoubleTouchTime;	//í‚¤ ë”ë¸”ì…ë ¥ ê°ì§€ìš© ë°°ì—´ ì„¤ì •
 			objs.people.at(0)->keyDoubleTouchLevel[3]++;
 		}
 		break;
-	case 'j': case 'J':			//ÆİÄ¡
-		objs.people.at(0)->AttKeyHold[0] = 1;	//Å°´­¸² ¼³Á¤
+	case 'j': case 'J':			//í€ì¹˜
+		objs.people.at(0)->AttKeyHold[0] = 1;	//í‚¤ëˆŒë¦¼ ì„¤ì •
 		if (objs.people.at(0)->ctrl) {
 			if (objs.people.at(0)->attackNum == 0) {
 				objs.people.at(0)->actNo = RPUNCH;
@@ -1551,7 +1551,7 @@ void MyKeyboard(unsigned char key, int x, int y)
 		}
 		break;
 	case 'k': case 'K':
-		objs.people.at(0)->AttKeyHold[1] = 1;	//Å°´­¸² ¼³Á¤
+		objs.people.at(0)->AttKeyHold[1] = 1;	//í‚¤ëˆŒë¦¼ ì„¤ì •
 		if (objs.people.at(0)->ctrl) {
 			objs.people.at(0)->actNo = RUPPER;
 			objs.people.at(0)->ctrl = 0;
@@ -1559,9 +1559,9 @@ void MyKeyboard(unsigned char key, int x, int y)
 
 		break;
 	case 'l': case 'L':
-		objs.people.at(0)->AttKeyHold[2] = 1;	//Å°´­¸² ¼³Á¤
+		objs.people.at(0)->AttKeyHold[2] = 1;	//í‚¤ëˆŒë¦¼ ì„¤ì •
 		break;
-	case 32:		//½ºÆäÀÌ½º
+	case 32:		//ìŠ¤í˜ì´ìŠ¤
 		break;
 	}
 
@@ -1569,55 +1569,55 @@ void MyKeyboard(unsigned char key, int x, int y)
 	//	cout<<"w \n";
 	//}
 
-//	p1ActionChange();	//p1Çàµ¿ÇÏ°Ô
+//	p1ActionChange();	//p1í–‰ë™í•˜ê²Œ
 
 	CalculateRadius();
 	glutPostRedisplay();
 }
 
-//¹æÇâÅ°µî Äİ¹é
+//ë°©í–¥í‚¤ë“± ì½œë°±
 void Specialkeys(int key, int x, int y)
 {
 	//	printf("Special Key = %d \n",key);
 
 	switch (key) {
-	case 1:		//F1		Àû HP 1·Î
-		if (objs.gameState == 1) {	//°ÔÀÓÁßÀÌ¸é
-			for (unsigned int i = 1; i < objs.people.size(); i++) {	//Àû¹è¿­ µ¹¸ç
-				objs.people.at(i)->HP = 1;				//Ã¼·Â¼Â
+	case 1:		//F1		ì  HP 1ë¡œ
+		if (objs.gameState == 1) {	//ê²Œì„ì¤‘ì´ë©´
+			for (unsigned int i = 1; i < objs.people.size(); i++) {	//ì ë°°ì—´ ëŒë©°
+				objs.people.at(i)->HP = 1;				//ì²´ë ¥ì…‹
 			}
 		}
 		break;
-	case 2:		//F2		ÁÖÀÎ°ø HP 1·Î		
+	case 2:		//F2		ì£¼ì¸ê³µ HP 1ë¡œ		
 		if (objs.gameState == 1) {
-			objs.people.at(0)->HP = 1;				//Ã¼·Â¼Â		
+			objs.people.at(0)->HP = 1;				//ì²´ë ¥ì…‹		
 		}
 		break;
-	case 3:		//F3		ÁÖÀÎ°ø HP Ã¤¿ò
+	case 3:		//F3		ì£¼ì¸ê³µ HP ì±„ì›€
 		if (objs.gameState == 1) {
-			objs.people.at(0)->HP = 1000;				//Ã¼·Â¼Â	
+			objs.people.at(0)->HP = 1000;				//ì²´ë ¥ì…‹	
 			if (isBgmPlay == true) {
 				mciSendString(("play " + soundBGM1 + " repeat").c_str(), 0, 0, 0);//play bgm
 			}
 		}
 		break;
-		//case 4:		//F4		ÀÓ½Ã(¿£µùÈ£Ãâ)
-		//	Thread[0] = (HANDLE)_beginthreadex(NULL, 0, AniEnding, (void*)NULL, 0, &ThreadState[0]);	//½º·¹µå·Î ÇÔ¼öÈ£Ãâ
+		//case 4:		//F4		ì„ì‹œ(ì—”ë”©í˜¸ì¶œ)
+		//	Thread[0] = (HANDLE)_beginthreadex(NULL, 0, AniEnding, (void*)NULL, 0, &ThreadState[0]);	//ìŠ¤ë ˆë“œë¡œ í•¨ìˆ˜í˜¸ì¶œ
 		//		objs.gameState = 3;
 		//	break;
-	case 100:		//¡ç		//½ÃÁ¡ÀÌµ¿
+	case 100:		//â†		//ì‹œì ì´ë™
 		objs.EyeX -= .5;
 		//		temp1 -= 0.03;
 		break;
-	case 101:		//¡è
+	case 101:		//â†‘
 		objs.EyeY += .5;
 		//		temp2 += 0.03;
 		break;
-	case 102:		//¡æ
+	case 102:		//â†’
 		objs.EyeX += .5;
 		//		temp1 += 0.03;
 		break;
-	case 103:		//¡é
+	case 103:		//â†“
 		objs.EyeY -= .5;
 		//		temp2 -= 0.03;
 		break;
@@ -1637,10 +1637,10 @@ void Specialkeys(int key, int x, int y)
 	}
 
 	CalculateRadius();
-	glutPostRedisplay();	//È­¸é »õ·Î°íÄ§
+	glutPostRedisplay();	//í™”ë©´ ìƒˆë¡œê³ ì¹¨
 }
 
-//Å°º¸µå ¶À
+//í‚¤ë³´ë“œ ë—Œ
 void MyKeyboardUp(unsigned char key, int x, int y) {
 	//	printf("keyUp = %d \n",key);
 
@@ -1665,63 +1665,63 @@ void MyKeyboardUp(unsigned char key, int x, int y) {
 			objs.people.at(0)->keyDoubleTouchLevel[3] = 2;
 		}
 		break;
-		//case 'j': case 'J':			//ÆİÄ¡
-		//	objs.people.at(0)->AttKeyHold[0] = 0;	//Å°¶À ¼³Á¤
+		//case 'j': case 'J':			//í€ì¹˜
+		//	objs.people.at(0)->AttKeyHold[0] = 0;	//í‚¤ë—Œ ì„¤ì •
 		//	break;
 		//case 'k': case 'K':
-		//	objs.people.at(0)->AttKeyHold[1] = 0;	//Å°´­¸² ¼³Á¤
+		//	objs.people.at(0)->AttKeyHold[1] = 0;	//í‚¤ëˆŒë¦¼ ì„¤ì •
 		//	break;
 		//case 'l': case 'L':
-		//	objs.people.at(0)->AttKeyHold[2] = 0;	//Å°´­¸² ¼³Á¤
+		//	objs.people.at(0)->AttKeyHold[2] = 0;	//í‚¤ëˆŒë¦¼ ì„¤ì •
 		//	break;
 	}
 
-	p1ActionChange();	//p1Çàµ¿ÇÔ¼ö È£Ãâ
+	p1ActionChange();	//p1í–‰ë™í•¨ìˆ˜ í˜¸ì¶œ
 }
 
-//ÁÖÀÎ°ø ¹æÇâÁ¶ÀÛ¿¡ µû¸¥ Çàµ¿À» ½ÃÅ°´Â ÇÔ¼ö
+//ì£¼ì¸ê³µ ë°©í–¥ì¡°ì‘ì— ë”°ë¥¸ í–‰ë™ì„ ì‹œí‚¤ëŠ” í•¨ìˆ˜
 void p1ActionChange() {
 	up1 = objs.people.at(0)->keyHold[0];
 	left1 = objs.people.at(0)->keyHold[1];
 	down1 = objs.people.at(0)->keyHold[2];
 	right1 = objs.people.at(0)->keyHold[3];
 
-	up2 = (objs.people.at(0)->keyDoubleTouchLevel[0] == 3) ? 1 : 0;	//´õºíÀÔ·Â µÇ¾ú³ª °¡Á®¿È
+	up2 = (objs.people.at(0)->keyDoubleTouchLevel[0] == 3) ? 1 : 0;	//ë”ë¸”ì…ë ¥ ë˜ì—ˆë‚˜ ê°€ì ¸ì˜´
 	left2 = (objs.people.at(0)->keyDoubleTouchLevel[1] == 3) ? 1 : 0;
 	down2 = (objs.people.at(0)->keyDoubleTouchLevel[2] == 3) ? 1 : 0;
 	right2 = (objs.people.at(0)->keyDoubleTouchLevel[3] == 3) ? 1 : 0;
 
-	if (objs.people.at(0)->ctrl) {	//Á¶ÀÛ°¡´ÉÇÒ¶§¸¸ ¹æÇâ¿¡ µû¸¥ ÀÌµ¿¼³Á¤
+	if (objs.people.at(0)->ctrl) {	//ì¡°ì‘ê°€ëŠ¥í• ë•Œë§Œ ë°©í–¥ì— ë”°ë¥¸ ì´ë™ì„¤ì •
 
-		if (up2 || left2 || right2 || down2) {		//´Ş¸®±â °Ë»ç
+		if (up2 || left2 || right2 || down2) {		//ë‹¬ë¦¬ê¸° ê²€ì‚¬
 			objs.people.at(0)->aniNo = ANI_RUN;
 			for (int i = 0; i < 4; i++) {
 				objs.people.at(0)->keyDoubleTouchLevel[i] = -1;
 			}
 		}
 
-		if (up1 && !left1 && !right1) {			//°È±â °Ë»ç. ¾ÕÂÊ
+		if (up1 && !left1 && !right1) {			//ê±·ê¸° ê²€ì‚¬. ì•ìª½
 			objs.people.at(0)->actNo = WALK_FRONT;
 		}
-		else if (up1 && left1) {						//¢Ø
+		else if (up1 && left1) {						//â†–
 			objs.people.at(0)->actNo = WALK_FRONT_LEFT;
 		}
-		else if (up1 && right1) {						//¢Ö
+		else if (up1 && right1) {						//â†—
 			objs.people.at(0)->actNo = WALK_FRONT_RIGHT;
 		}
-		else if (left1 && !right1 && !up1 && !down1) {	//¿ŞÂÊ
+		else if (left1 && !right1 && !up1 && !down1) {	//ì™¼ìª½
 			objs.people.at(0)->actNo = WALK_LEFT;
 		}
-		else if (!left1 && right1 && !up1 && !down1) {	//¿À¸¥ÂÊ
+		else if (!left1 && right1 && !up1 && !down1) {	//ì˜¤ë¥¸ìª½
 			objs.people.at(0)->actNo = WALK_RIGHT;
 		}
-		else if (down1 && !left1 && !right1) {			//¾Æ·¡
+		else if (down1 && !left1 && !right1) {			//ì•„ë˜
 			objs.people.at(0)->actNo = WALK_BACK;
 		}
-		else if (down1 && left1) {					//¢×
+		else if (down1 && left1) {					//â†™
 			objs.people.at(0)->actNo = WALK_BACK_LEFT;
 		}
-		else if (down1 && right1) {					//¢Ù
+		else if (down1 && right1) {					//â†˜
 			objs.people.at(0)->actNo = WALK_BACK_RIGHT;
 		}
 		else {
@@ -1732,93 +1732,93 @@ void p1ActionChange() {
 	//	printf("%d %d %d %d \n",up2,left2,right2,down2);
 }
 
-//¿ìÅ¬¸¯ ¸ŞÀÎ¸Ş´º
+//ìš°í´ë¦­ ë©”ì¸ë©”ë‰´
 void MyMainMenu(int entryID) {
 	if (isCanMouse == false) {
 		return;
 	}
 
 	switch (entryID) {
-	case 50:			//ÀÎÆ®·Î ¾Ö´Ï¸ŞÀÌ¼Ç
-		InitPosition();	//¹°Ã¼ À§Ä¡ÃÊ±âÈ­
+	case 50:			//ì¸íŠ¸ë¡œ ì• ë‹ˆë©”ì´ì…˜
+		InitPosition();	//ë¬¼ì²´ ìœ„ì¹˜ì´ˆê¸°í™”
 
 		//for(int i=0; i < AniNum; i++){			
 		//	GetExitCodeThread(Thread[i], NULL);	//
-		//	TerminateThread(Thread[i], NULL);		//½º·¹µå °­Á¦Á¾·á
-		//	CloseHandle(Thread[i]);					//Æ÷ÀÎÅÍ Á¦°Å
+		//	TerminateThread(Thread[i], NULL);		//ìŠ¤ë ˆë“œ ê°•ì œì¢…ë£Œ
+		//	CloseHandle(Thread[i]);					//í¬ì¸í„° ì œê±°
 		//}
 
 		isLifeBarDraw = false;
-		Thread[0] = (HANDLE)_beginthreadex(NULL, 0, AniIntro, (void*)NULL, 0, &ThreadState[0]);	//½º·¹µå·Î ÇÔ¼öÈ£Ãâ
+		Thread[0] = (HANDLE)_beginthreadex(NULL, 0, AniIntro, (void*)NULL, 0, &ThreadState[0]);	//ìŠ¤ë ˆë“œë¡œ í•¨ìˆ˜í˜¸ì¶œ
 		break;
-	case 100:			//ÇÎÆş ¾Ö´Ï¸ÅÀÌ¼Ç
-		InitPosition();	//¹°Ã¼ À§Ä¡ÃÊ±âÈ­
+	case 100:			//í•‘í ì• ë‹ˆë§¤ì´ì…˜
+		InitPosition();	//ë¬¼ì²´ ìœ„ì¹˜ì´ˆê¸°í™”
 		break;
-	case 800:	//°ÔÀÓÆÄÆ® Å×½ºÆ® (AI on)
-		InitPosition();	//¹°Ã¼ À§Ä¡ÃÊ±âÈ­
+	case 800:	//ê²Œì„íŒŒíŠ¸ í…ŒìŠ¤íŠ¸ (AI on)
+		InitPosition();	//ë¬¼ì²´ ìœ„ì¹˜ì´ˆê¸°í™”
 		objs.gameState = 1;
 		isLifeBarDraw = true;
-		objs.isAniControl = false;//¾Ö´ÏÁ¦¾î off
+		objs.isAniControl = false;//ì• ë‹ˆì œì–´ off
 		if (isBgmPlay == true) {
 			mciSendString(("play " + soundBGM1 + " repeat").c_str(), 0, 0, 0);//play bgm
 		}
 
-		objs.people.at(0)->x = -40.6;//ÀÓ½Ã
+		objs.people.at(0)->x = -40.6;//ì„ì‹œ
 		objs.people.at(0)->z = -38;//
-		objs.EyeX = objs.people.at(0)->x + 10;		//½ÃÁ¡¼Â
+		objs.EyeX = objs.people.at(0)->x + 10;		//ì‹œì ì…‹
 		objs.EyeZ = objs.people.at(0)->z; // + 5;
-		objs.AtX = objs.people.at(0)->x;		//ÃÊÁ¡¼Â
+		objs.AtX = objs.people.at(0)->x;		//ì´ˆì ì…‹
 		objs.AtZ = objs.people.at(0)->z;
 
 
 
-		objs.people.at(0)->actNo = IDLE;	//ÁÖÀÎ°ø ¿òÁ÷ÀÏ ¼ö ÀÖ°Ô
+		objs.people.at(0)->actNo = IDLE;	//ì£¼ì¸ê³µ ì›€ì§ì¼ ìˆ˜ ìˆê²Œ
 		objs.people.at(0)->ctrl = 1;
-		objs.people.at(0)->isDraw = true;		//±×¸°´Ù ¼³Á¤
+		objs.people.at(0)->isDraw = true;		//ê·¸ë¦°ë‹¤ ì„¤ì •
 		objs.people.at(0)->HP = 1000;
 
 		break;
-	case 850:	//°ÔÀÓÆÄÆ® Å×½ºÆ® (AI off)
-		InitPosition();	//¹°Ã¼ À§Ä¡ÃÊ±âÈ­
+	case 850:	//ê²Œì„íŒŒíŠ¸ í…ŒìŠ¤íŠ¸ (AI off)
+		InitPosition();	//ë¬¼ì²´ ìœ„ì¹˜ì´ˆê¸°í™”
 		objs.gameState = 1;
 		isLifeBarDraw = true;
-		objs.isAniControl = false;	//¾Ö´ÏÁ¦¾î off
+		objs.isAniControl = false;	//ì• ë‹ˆì œì–´ off
 		if (isBgmPlay == true) {
 			mciSendString(("play " + soundBGM1 + " repeat").c_str(), 0, 0, 0);//play bgm
 		}
 
-		objs.people.at(0)->x = -40.6;//ÀÓ½Ã
+		objs.people.at(0)->x = -40.6;//ì„ì‹œ
 		objs.people.at(0)->z = -38;//
-		objs.EyeX = objs.people.at(0)->x + 10;		//½ÃÁ¡¼Â
+		objs.EyeX = objs.people.at(0)->x + 10;		//ì‹œì ì…‹
 		objs.EyeZ = objs.people.at(0)->z; // + 5;
-		objs.AtX = objs.people.at(0)->x;		//ÃÊÁ¡¼Â
+		objs.AtX = objs.people.at(0)->x;		//ì´ˆì ì…‹
 		objs.AtZ = objs.people.at(0)->z;
 
 
-		objs.people.at(0)->actNo = IDLE;	//ÁÖÀÎ°ø ¿òÁ÷ÀÏ ¼ö ÀÖ°Ô
+		objs.people.at(0)->actNo = IDLE;	//ì£¼ì¸ê³µ ì›€ì§ì¼ ìˆ˜ ìˆê²Œ
 		objs.people.at(0)->ctrl = 1;
-		objs.people.at(0)->isDraw = true;		//±×¸°´Ù ¼³Á¤
+		objs.people.at(0)->isDraw = true;		//ê·¸ë¦°ë‹¤ ì„¤ì •
 		objs.people.at(0)->HP = 1000;
 
 		break;
-	case 900:		//Ãë¼Ò(ÃÊ±âÈ­)
-		InitPosition();	//¹°Ã¼ À§Ä¡ÃÊ±âÈ­
+	case 900:		//ì·¨ì†Œ(ì´ˆê¸°í™”)
+		InitPosition();	//ë¬¼ì²´ ìœ„ì¹˜ì´ˆê¸°í™”
 		objs.gameState = 0;
 		isLifeBarDraw = false;
-		isCarDraw = false;		//»çÀÌ·»È¿°ú
-		isCyren = false;		//»çÀÌ·»È¿°ú
+		isCarDraw = false;		//ì‚¬ì´ë Œíš¨ê³¼
+		isCyren = false;		//ì‚¬ì´ë Œíš¨ê³¼
 		car->Init();
 		objs.isAniControl = false;
 		mciSendString(("stop " + soundBGM1).c_str(), 0, 0, 0);//stop bgm
 
 
 
-		objs.gameState = 0;	//»óÈ²»óÅÂ0
+		objs.gameState = 0;	//ìƒí™©ìƒíƒœ0
 		break;
 	}
 }
 
-//¿ìÅ¬¸¯ ¼­ºê¸Ş´º
+//ìš°í´ë¦­ ì„œë¸Œë©”ë‰´
 void MySubMenu(int entryID) {
 	switch (entryID) {
 	case 4:
@@ -1834,15 +1834,15 @@ void MySubMenu(int entryID) {
 	}
 }
 
-//¸¶¿ì½º Å¬¸¯Äİ¹é(´­·¶À»½Ã, ¶ÃÀ»½Ã)
+//ë§ˆìš°ìŠ¤ í´ë¦­ì½œë°±(ëˆŒë €ì„ì‹œ, ë—ì„ì‹œ)
 void MyMouseMove(int button, int state, GLint X, GLint Y)
 {
 	if (isCanMouse == false) {
 		return;
 	}
 
-	// ¸¶¿ì½º ¿òÁ÷ÀÓÀ» X, Y¸¦ º¯¼ö¿¡ ÇÒ´ç
-	if (state == 0 && button == 0) {	//ÁÂpush½Ã
+	// ë§ˆìš°ìŠ¤ ì›€ì§ì„ì„ X, Yë¥¼ ë³€ìˆ˜ì— í• ë‹¹
+	if (state == 0 && button == 0) {	//ì¢Œpushì‹œ
 		oldX = X;
 		oldY = Y;
 		plusX = 0;
@@ -1854,40 +1854,40 @@ void MyMouseMove(int button, int state, GLint X, GLint Y)
 		//	glutPostRedisplay();
 	}
 
-	if (state == 1) {		//¹öÆ°release ½Ã
-		CalculateRadius();		//½ÃÁ¡-ÃÊÁ¡ °Å¸®±¸ÇØ ¼ÂÆÃ
+	if (state == 1) {		//ë²„íŠ¼release ì‹œ
+		CalculateRadius();		//ì‹œì -ì´ˆì  ê±°ë¦¬êµ¬í•´ ì…‹íŒ…
 	}
 }
-//¸¶¿ì½º °­Á¦Å¬¸¯¿ë
+//ë§ˆìš°ìŠ¤ ê°•ì œí´ë¦­ìš©
 void MyMouseMove2(int button, int state, GLint X, GLint Y)
 {
-	if (state == 0 && button == 0) {	//ÁÂpush½Ã
+	if (state == 0 && button == 0) {	//ì¢Œpushì‹œ
 		oldX = X;
 		oldY = Y;
 		plusX = 0;
 		plusY = 0;
 	}
-	if (state == 1) {		//¹öÆ°release ½Ã
-		CalculateRadius();		//½ÃÁ¡-ÃÊÁ¡ °Å¸®±¸ÇØ ¼ÂÆÃ
+	if (state == 1) {		//ë²„íŠ¼release ì‹œ
+		CalculateRadius();		//ì‹œì -ì´ˆì  ê±°ë¦¬êµ¬í•´ ì…‹íŒ…
 	}
 }
 
-//¸¶¿ì½º Å¬¸¯ÀÌµ¿Äİ¹é
+//ë§ˆìš°ìŠ¤ í´ë¦­ì´ë™ì½œë°±
 void MyMotion(GLint X, GLint Y)
 {
 	if (isCanMouse == false) {
 		return;
 	}
 
-	int diffX = (X - oldX);		//ÁÂÇ¥Â÷ÀÌ °¨Áö¿ë º¯¼ö 4°³
+	int diffX = (X - oldX);		//ì¢Œí‘œì°¨ì´ ê°ì§€ìš© ë³€ìˆ˜ 4ê°œ
 	int diffY = -(Y - oldY);
 	oldX = X;
 	oldY = Y;
 
-	plusX += diffX * (180.0 / width);	//´õÇÒ°¢µµ °è»ê
+	plusX += diffX * (180.0 / width);	//ë”í• ê°ë„ ê³„ì‚°
 	plusY += diffY * (180.0 / height);
 
-	double angleX = objs.eyeAngleX + plusX;	//°á°ú°¢µµ °è»ê
+	double angleX = objs.eyeAngleX + plusX;	//ê²°ê³¼ê°ë„ ê³„ì‚°
 	double angleY = objs.eyeAngleY + plusY;
 
 	EyePosChange(angleX, angleY);
@@ -1897,66 +1897,66 @@ void MyMotion(GLint X, GLint Y)
 	//printf("AngleX = %f \n",angleX);
 	//printf("AngleY = %f \n",angleY);
 }
-//¸¶¿ì½º °­Á¦Å¬¸¯ÀÌµ¿¿ë
+//ë§ˆìš°ìŠ¤ ê°•ì œí´ë¦­ì´ë™ìš©
 void MyMotion2(GLint X, GLint Y)
 {
-	int diffX = (X - oldX);		//ÁÂÇ¥Â÷ÀÌ °¨Áö¿ë º¯¼ö 4°³
+	int diffX = (X - oldX);		//ì¢Œí‘œì°¨ì´ ê°ì§€ìš© ë³€ìˆ˜ 4ê°œ
 	int diffY = -(Y - oldY);
 	oldX = X;
 	oldY = Y;
 
-	plusX += diffX * (180.0 / width);	//´õÇÒ°¢µµ °è»ê
+	plusX += diffX * (180.0 / width);	//ë”í• ê°ë„ ê³„ì‚°
 	plusY += diffY * (180.0 / height);
 
-	double angleX = objs.eyeAngleX + plusX;	//°á°ú°¢µµ °è»ê
+	double angleX = objs.eyeAngleX + plusX;	//ê²°ê³¼ê°ë„ ê³„ì‚°
 	double angleY = objs.eyeAngleY + plusY;
 
 	EyePosChange(angleX, angleY);
 }
 
-//½ÃÁ¡ÀÌµ¿(MyMotion¿¡¼­ ºĞ¸®. ¾Ö´Ï¿¡¼­ ÄÁÆ®·Ñ°¡´ÉÄÉ ÇÏ±âÀ§ÇÔ)
+//ì‹œì ì´ë™(MyMotionì—ì„œ ë¶„ë¦¬. ì• ë‹ˆì—ì„œ ì»¨íŠ¸ë¡¤ê°€ëŠ¥ì¼€ í•˜ê¸°ìœ„í•¨)
 void EyePosChange(GLint angleX, GLint angleY) {
-	if (angleY >= 89) {		//½ÃÁ¡ »óÇÏ Á¦ÇÑ
+	if (angleY >= 89) {		//ì‹œì  ìƒí•˜ ì œí•œ
 		angleY = 89;
 	}
 	else if (angleY <= 1) {
 		angleY = 1;
 	}
 
-	double xPosX = radius * cos(angleX * pi / 180.0);		//¶óµğ¾Èº¯È¯ÇÏ¿© ÃÊÁ¡À¸·ÎºÎÅÍÀÇ ÁÂ¿ì x¼ººĞ ±¸ÇÔ
-	double xPosY = radius * sin(angleX * pi / 180.0);		//¶óµğ¾Èº¯È¯ÇÏ¿© ÃÊÁ¡À¸·ÎºÎÅÍÀÇ ÁÂ¿ì Y¼ººĞ ±¸ÇÔ
-	double yPosX = radius * cos(angleY * pi / 180.0);		//¶óµğ¾Èº¯È¯ÇÏ¿© ÃÊÁ¡À¸·ÎºÎÅÍÀÇ »óÇÏ x¼ººĞ ±¸ÇÔ
-	double yPosY = radius * sin(angleY * pi / 180.0);		//¶óµğ¾Èº¯È¯ÇÏ¿© ÃÊÁ¡À¸·ÎºÎÅÍÀÇ »óÇÏ Y¼ººĞ ±¸ÇÔ
+	double xPosX = radius * cos(angleX * pi / 180.0);		//ë¼ë””ì•ˆë³€í™˜í•˜ì—¬ ì´ˆì ìœ¼ë¡œë¶€í„°ì˜ ì¢Œìš° xì„±ë¶„ êµ¬í•¨
+	double xPosY = radius * sin(angleX * pi / 180.0);		//ë¼ë””ì•ˆë³€í™˜í•˜ì—¬ ì´ˆì ìœ¼ë¡œë¶€í„°ì˜ ì¢Œìš° Yì„±ë¶„ êµ¬í•¨
+	double yPosX = radius * cos(angleY * pi / 180.0);		//ë¼ë””ì•ˆë³€í™˜í•˜ì—¬ ì´ˆì ìœ¼ë¡œë¶€í„°ì˜ ìƒí•˜ xì„±ë¶„ êµ¬í•¨
+	double yPosY = radius * sin(angleY * pi / 180.0);		//ë¼ë””ì•ˆë³€í™˜í•˜ì—¬ ì´ˆì ìœ¼ë¡œë¶€í„°ì˜ ìƒí•˜ Yì„±ë¶„ êµ¬í•¨
 
-	double PosZ = yPosX * cos(angleX * pi / 180.0);		//ÁÂ¿ì,»óÇÏ ÅëÇÕµÈ À§Ä¡·ÎºÎÅÍ ZÀÌµ¿À§Ä¡ °è»ê
-	double PosX = PosZ * tan(angleX * pi / 180.0);		//ÁÂ¿ì,»óÇÏ ÅëÇÕµÈ À§Ä¡·ÎºÎÅÍ XÀÌµ¿À§Ä¡ °è»ê
+	double PosZ = yPosX * cos(angleX * pi / 180.0);		//ì¢Œìš°,ìƒí•˜ í†µí•©ëœ ìœ„ì¹˜ë¡œë¶€í„° Zì´ë™ìœ„ì¹˜ ê³„ì‚°
+	double PosX = PosZ * tan(angleX * pi / 180.0);		//ì¢Œìš°,ìƒí•˜ í†µí•©ëœ ìœ„ì¹˜ë¡œë¶€í„° Xì´ë™ìœ„ì¹˜ ê³„ì‚°
 
-	objs.EyeZ = objs.AtZ + PosZ;			//½ÃÁ¡ ÅëÇÕÁÂÇ¥¼³Á¤
+	objs.EyeZ = objs.AtZ + PosZ;			//ì‹œì  í†µí•©ì¢Œí‘œì„¤ì •
 	objs.EyeX = objs.AtX + PosX;//xPosY;
 	objs.EyeY = objs.AtY + yPosY;
 }
 
-//¸¶¿ì½º ±×³ÉÀÌµ¿Äİ¹é(ÇöÀç ¹Ì»ç¿ë)
+//ë§ˆìš°ìŠ¤ ê·¸ëƒ¥ì´ë™ì½œë°±(í˜„ì¬ ë¯¸ì‚¬ìš©)
 void MyPassiveMotion(GLint X, GLint Y) {
 
-	double angleX = objs.eyeAngleX + (X - width / 2) / (width / 2 / 180.0);		//ÁÂ¿ì°¢µµ±¸ÇÔ -180 ~ 180
-	double angleY = objs.eyeAngleY + -((Y - height / 2) / (height / 2 / 180.0));	//»óÇÏ°¢µµ±¸ÇÔ
+	double angleX = objs.eyeAngleX + (X - width / 2) / (width / 2 / 180.0);		//ì¢Œìš°ê°ë„êµ¬í•¨ -180 ~ 180
+	double angleY = objs.eyeAngleY + -((Y - height / 2) / (height / 2 / 180.0));	//ìƒí•˜ê°ë„êµ¬í•¨
 
-	double xPosX = radius * cos(angleX * pi / 180.0);		//¶óµğ¾Èº¯È¯ÇÏ¿© ÃÊÁ¡À¸·ÎºÎÅÍÀÇ ÁÂ¿ì x¼ººĞ ±¸ÇÔ
-	double xPosY = radius * sin(angleX * pi / 180.0);		//¶óµğ¾Èº¯È¯ÇÏ¿© ÃÊÁ¡À¸·ÎºÎÅÍÀÇ ÁÂ¿ì Y¼ººĞ ±¸ÇÔ
-	double yPosX = radius * cos(angleY * pi / 180.0);		//¶óµğ¾Èº¯È¯ÇÏ¿© ÃÊÁ¡À¸·ÎºÎÅÍÀÇ »óÇÏ x¼ººĞ ±¸ÇÔ
-	double yPosY = radius * sin(angleY * pi / 180.0);		//¶óµğ¾Èº¯È¯ÇÏ¿© ÃÊÁ¡À¸·ÎºÎÅÍÀÇ »óÇÏ Y¼ººĞ ±¸ÇÔ
+	double xPosX = radius * cos(angleX * pi / 180.0);		//ë¼ë””ì•ˆë³€í™˜í•˜ì—¬ ì´ˆì ìœ¼ë¡œë¶€í„°ì˜ ì¢Œìš° xì„±ë¶„ êµ¬í•¨
+	double xPosY = radius * sin(angleX * pi / 180.0);		//ë¼ë””ì•ˆë³€í™˜í•˜ì—¬ ì´ˆì ìœ¼ë¡œë¶€í„°ì˜ ì¢Œìš° Yì„±ë¶„ êµ¬í•¨
+	double yPosX = radius * cos(angleY * pi / 180.0);		//ë¼ë””ì•ˆë³€í™˜í•˜ì—¬ ì´ˆì ìœ¼ë¡œë¶€í„°ì˜ ìƒí•˜ xì„±ë¶„ êµ¬í•¨
+	double yPosY = radius * sin(angleY * pi / 180.0);		//ë¼ë””ì•ˆë³€í™˜í•˜ì—¬ ì´ˆì ìœ¼ë¡œë¶€í„°ì˜ ìƒí•˜ Yì„±ë¶„ êµ¬í•¨
 
-	double PosZ = yPosX * cos(angleX * pi / 180.0);		//ÁÂ¿ì,»óÇÏ ÅëÇÕµÈ À§Ä¡·ÎºÎÅÍ ZÀÌµ¿À§Ä¡ °è»ê
-	double PosX = PosZ * tan(angleX * pi / 180.0);		//ÁÂ¿ì,»óÇÏ ÅëÇÕµÈ À§Ä¡·ÎºÎÅÍ XÀÌµ¿À§Ä¡ °è»ê
+	double PosZ = yPosX * cos(angleX * pi / 180.0);		//ì¢Œìš°,ìƒí•˜ í†µí•©ëœ ìœ„ì¹˜ë¡œë¶€í„° Zì´ë™ìœ„ì¹˜ ê³„ì‚°
+	double PosX = PosZ * tan(angleX * pi / 180.0);		//ì¢Œìš°,ìƒí•˜ í†µí•©ëœ ìœ„ì¹˜ë¡œë¶€í„° Xì´ë™ìœ„ì¹˜ ê³„ì‚°
 
-	//EyeZ = AtZ + xPosX;	//ÁÂ¿ì·Î¸¸ ÀÌµ¿½Ã
+	//EyeZ = AtZ + xPosX;	//ì¢Œìš°ë¡œë§Œ ì´ë™ì‹œ
 	//EyeX = AtX + xPosY;
 
-	//EyeZ = AtZ + yPosX;	//»óÇÏ·Î¸¸ ÀÌµ¿½Ã
+	//EyeZ = AtZ + yPosX;	//ìƒí•˜ë¡œë§Œ ì´ë™ì‹œ
 	//EyeY = AtY + yPosY;
 
-	objs.EyeZ = objs.AtZ + PosZ;			//½ÃÁ¡ ÅëÇÕÁÂÇ¥¼³Á¤
+	objs.EyeZ = objs.AtZ + PosZ;			//ì‹œì  í†µí•©ì¢Œí‘œì„¤ì •
 	objs.EyeX = objs.AtX + PosX;//xPosY;
 	objs.EyeY = objs.AtY + yPosY;
 
@@ -1973,23 +1973,23 @@ void MyPassiveMotion(GLint X, GLint Y) {
 	glutPostRedisplay();
 }
 
-//EyeX, EyeY¸¦ ViewX,Y·ÎºÎÅÍ °è»ê
+//EyeX, EyeYë¥¼ ViewX,Yë¡œë¶€í„° ê³„ì‚°
 void CalculateEyeXY() {
-	width = glutGet(GLUT_WINDOW_WIDTH);	//À©µµ¿ì À§Ä¡¹ŞÀ½
+	width = glutGet(GLUT_WINDOW_WIDTH);	//ìœˆë„ìš° ìœ„ì¹˜ë°›ìŒ
 	height = glutGet(GLUT_WINDOW_HEIGHT);
 
-	objs.EyeX = (ViewX - width / 2) / width * 20 + 2.5;			//½ÃÁ¡°è»ê
+	objs.EyeX = (ViewX - width / 2) / width * 20 + 2.5;			//ì‹œì ê³„ì‚°
 	objs.EyeY = (height / 2 - ViewY) / height * 20 + 2.5;
 }
 
-//ÃÊÁ¡-½ÃÁ¡°£ °Å¸®/°¢µµ ±¸ÇÔ
+//ì´ˆì -ì‹œì ê°„ ê±°ë¦¬/ê°ë„ êµ¬í•¨
 void CalculateRadius() {
-	radius = sqrt(pow((objs.EyeX - objs.AtX), 2) + pow((objs.EyeY - objs.AtY), 2) + pow((objs.EyeZ - objs.AtZ), 2));//ÃÊÁ¡-½ÃÁ¡°£ °Å¸®±¸ÇÔ
+	radius = sqrt(pow((objs.EyeX - objs.AtX), 2) + pow((objs.EyeY - objs.AtY), 2) + pow((objs.EyeZ - objs.AtZ), 2));//ì´ˆì -ì‹œì ê°„ ê±°ë¦¬êµ¬í•¨
 
-	double XX = (objs.EyeZ - objs.AtZ);								//ÃÊÁ¡-½ÃÁ¡°£ °¢ ¼±±æÀÌ ±¸ÇÔ
+	double XX = (objs.EyeZ - objs.AtZ);								//ì´ˆì -ì‹œì ê°„ ê° ì„ ê¸¸ì´ êµ¬í•¨
 	double YX = sqrt(pow((objs.EyeX - objs.AtX), 2) + pow((objs.EyeZ - objs.AtZ), 2));
 
-	objs.eyeAngleX = acos(XX / YX) * 180.0 / pi;			//¼±±æÀÌ¸¦ ÀÌ¿ëÇÑ ¿ª»ï°¢ÇÔ¼ö·Î ½ÃÁ¡, ÃÊÁ¡°£ °¢µµ±¸ÇÔ.
+	objs.eyeAngleX = acos(XX / YX) * 180.0 / pi;			//ì„ ê¸¸ì´ë¥¼ ì´ìš©í•œ ì—­ì‚¼ê°í•¨ìˆ˜ë¡œ ì‹œì , ì´ˆì ê°„ ê°ë„êµ¬í•¨.
 	objs.eyeAngleY = acos(YX / radius) * 180.0 / pi;
 
 	if (objs.EyeX < objs.AtX) {
@@ -2003,7 +2003,7 @@ void CalculateRadius() {
 	//printf("eyeAngleY = %f \n",objs.eyeAngleY);
 }
 
-//È­¸éÁ¶Á¤ Äİ¹é
+//í™”ë©´ì¡°ì • ì½œë°±
 void MyReshape(int w, int h) {
 	//	printf("width = %d, height = %d \n", w, h);
 
@@ -2013,36 +2013,36 @@ void MyReshape(int w, int h) {
 	glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
 }
 
-//µµ¿ò¸»Ãâ·Â
+//ë„ì›€ë§ì¶œë ¥
 void RenderHelp()
 {
-	glEnable(GL_LIGHT7);	//¹à°Ô ÇÏ±â¿ë ±¤¿ø
+	glEnable(GL_LIGHT7);	//ë°ê²Œ í•˜ê¸°ìš© ê´‘ì›
 
-	const short textsMax = 26;	//¹®ÀÚ ¼ö
+	const short textsMax = 26;	//ë¬¸ì ìˆ˜
 	int len[textsMax];
 	string texts[textsMax];
 	char* text[textsMax];
 
 	float posX = -0.8, posY = 0.7;
 
-	//texts[0] = "- ¸¶¿ì½º¿ìÅ¬¸¯ : ¸Ş´º";
-	//texts[1] = "- E : WCS¿øÁ¡°ú ÃÊÁ¡¿¡ ±¸ Ç¥½Ã & °ø°İÆÇÁ¤ / ÇÇ°İÆÇÁ¤ ±¸ Ç¥½Ã";
-	//texts[2] = "- R : ¿ÍÀÌ¾îÇÁ·¹ÀÓ/¼Ö¸®µå·»´õ¸µ Åä±Û";
-	//texts[3] = "- T : ÇÃ·§/±¸·Î ¼ÎÀÌµù Åä±Û";
-	//texts[4] = "- Z, X : ÁÜÀÎ/ÁÜ¾Æ¿ô";
-	//texts[5] = "- F, G : ½ÃÁ¡À» ¿øÁ¡À» ÇâÇØ ÀÌµ¿/¸Ö¾îÁö°Ô";
-	//texts[6] = "- ] : ¾Ö´Ï¸ÅÀÌ¼Ç ¼Óµµ ºü¸£°Ô (Áö¿¬½Ã°£ °¨¼Ò)";
-	//texts[7] = "- [ : ¾Ö´Ï¸ÅÀÌ¼Ç ¼Óµµ ´À¸®°Ô (Áö¿¬½Ã°£ Áõ°¡)";
-	//texts[8] = "- P : ¾Ö´Ï¸ÅÀÌ¼Ç ÀÏ½ÃÁ¤Áö/Àç»ı";
-	//texts[9] = "- È­»ìÇ¥Å°, Å°ÆĞµå0, Å°ÆĞµåDelete : ½ÃÁ¡ÀÌµ¿";
-	//texts[10] = "- Å°ÆĞµåÀÇ ¹æÇâÅ°, Å°ÆĞµå+,- : ÃÊÁ¡ÀÌµ¿";
-	//texts[11] = "- ¸¶¿ì½º Å¬¸¯-µå·¡±× : ½ÃÁ¡È¸Àü (»ï°¢ÇÔ¼ö ÀÌ¿ë)";
-	//texts[12] = "- Q : Á¾·á";
+	//texts[0] = "- ë§ˆìš°ìŠ¤ìš°í´ë¦­ : ë©”ë‰´";
+	//texts[1] = "- E : WCSì›ì ê³¼ ì´ˆì ì— êµ¬ í‘œì‹œ & ê³µê²©íŒì • / í”¼ê²©íŒì • êµ¬ í‘œì‹œ";
+	//texts[2] = "- R : ì™€ì´ì–´í”„ë ˆì„/ì†”ë¦¬ë“œë Œë”ë§ í† ê¸€";
+	//texts[3] = "- T : í”Œë«/êµ¬ë¡œ ì…°ì´ë”© í† ê¸€";
+	//texts[4] = "- Z, X : ì¤Œì¸/ì¤Œì•„ì›ƒ";
+	//texts[5] = "- F, G : ì‹œì ì„ ì›ì ì„ í–¥í•´ ì´ë™/ë©€ì–´ì§€ê²Œ";
+	//texts[6] = "- ] : ì• ë‹ˆë§¤ì´ì…˜ ì†ë„ ë¹ ë¥´ê²Œ (ì§€ì—°ì‹œê°„ ê°ì†Œ)";
+	//texts[7] = "- [ : ì• ë‹ˆë§¤ì´ì…˜ ì†ë„ ëŠë¦¬ê²Œ (ì§€ì—°ì‹œê°„ ì¦ê°€)";
+	//texts[8] = "- P : ì• ë‹ˆë§¤ì´ì…˜ ì¼ì‹œì •ì§€/ì¬ìƒ";
+	//texts[9] = "- í™”ì‚´í‘œí‚¤, í‚¤íŒ¨ë“œ0, í‚¤íŒ¨ë“œDelete : ì‹œì ì´ë™";
+	//texts[10] = "- í‚¤íŒ¨ë“œì˜ ë°©í–¥í‚¤, í‚¤íŒ¨ë“œ+,- : ì´ˆì ì´ë™";
+	//texts[11] = "- ë§ˆìš°ìŠ¤ í´ë¦­-ë“œë˜ê·¸ : ì‹œì íšŒì „ (ì‚¼ê°í•¨ìˆ˜ ì´ìš©)";
+	//texts[12] = "- Q : ì¢…ë£Œ";
 	//texts[13] = "";
-	//texts[14] = "------------------------ ÁÖÀÎ°ø Á¶ÀÛ ---------------------------------";
-	//texts[15] = "- W,A,S,D (¹æÇâÅ°): ÀÌµ¿";
-	//texts[16] = "- °°Àº¹æÇâ 2¹øÀÔ·Â : ´Ş¸®±â";
-	//texts[17] = "- J : °ø°İ";
+	//texts[14] = "------------------------ ì£¼ì¸ê³µ ì¡°ì‘ ---------------------------------";
+	//texts[15] = "- W,A,S,D (ë°©í–¥í‚¤): ì´ë™";
+	//texts[16] = "- ê°™ì€ë°©í–¥ 2ë²ˆì…ë ¥ : ë‹¬ë¦¬ê¸°";
+	//texts[17] = "- J : ê³µê²©";
 	texts[0] = "- Right Click : Menu";
 	texts[1] = "- E           : Draw Shperes at View/Focus point. Draw Collision Shperes";
 	texts[2] = "- R           : WireFrame / Solid rendering Toggle";
@@ -2070,7 +2070,7 @@ void RenderHelp()
 	texts[24] = "- F2                        : Set Hero's HP to 1";
 	texts[25] = "- F3                        : Set Hero's HP to Full";
 
-	for (int i = 0; i < textsMax; i++) {	//±æÀÌ, char* ¹ŞÀ½
+	for (int i = 0; i < textsMax; i++) {	//ê¸¸ì´, char* ë°›ìŒ
 		text[i] = (char*)texts[i].c_str();
 		len[i] = texts[i].length();
 	}
@@ -2079,8 +2079,8 @@ void RenderHelp()
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	//	glColor3f(1.0,1.0,0.1);//³ë¶û
-	glColor3f(0, 0, 0);	//°ËÁ¤
+	//	glColor3f(1.0,1.0,0.1);//ë…¸ë‘
+	glColor3f(0, 0, 0);	//ê²€ì •
 
 	for (int i = 0; i < textsMax; i++) {
 		glRasterPos2f(posX, posY);
@@ -2094,13 +2094,13 @@ void RenderHelp()
 	glFlush();
 	glPopAttrib();
 
-	glDisable(GL_LIGHT7);		//ÅØ½ºÆ® ¹à°Ô ÇÏ±â¿ë ±¤¿ø ²û
+	glDisable(GL_LIGHT7);		//í…ìŠ¤íŠ¸ ë°ê²Œ í•˜ê¸°ìš© ê´‘ì› ë”
 }
 
-//±ÛÀÚÃâ·Â
+//ê¸€ìì¶œë ¥
 void RenderText(char* text, float posX, float posY)
 {
-	glEnable(GL_LIGHT7);	//¹à°Ô ÇÏ±â¿ë ±¤¿ø
+	glEnable(GL_LIGHT7);	//ë°ê²Œ í•˜ê¸°ìš© ê´‘ì›
 
 	int len = strlen(text);
 
@@ -2119,12 +2119,12 @@ void RenderText(char* text, float posX, float posY)
 	glFlush();
 	glPopAttrib();
 
-	glDisable(GL_LIGHT7);		//ÅØ½ºÆ® ¹à°Ô ÇÏ±â¿ë ±¤¿ø ²û
+	glDisable(GL_LIGHT7);		//í…ìŠ¤íŠ¸ ë°ê²Œ í•˜ê¸°ìš© ê´‘ì› ë”
 }
 
-//¶óÀÌÇÁ¹Ù Ç¥½Ã (²Ä¼ö. ¿ø·¡ 3dÁÂÇ¥¸¦ 2dÁÂÇ¥·Î º¯È¯ÈÄ ±×·Á¾ßÇÏ³ª)q
+//ë¼ì´í”„ë°” í‘œì‹œ (ê¼¼ìˆ˜. ì›ë˜ 3dì¢Œí‘œë¥¼ 2dì¢Œí‘œë¡œ ë³€í™˜í›„ ê·¸ë ¤ì•¼í•˜ë‚˜)q
 void DrawLifeBar() {
-	//	float gap1 = objs.people.at(0)->displayHP - objs.people.at(0)->HP;	//Ç¥½ÃÃ¼·Â°ú ÇöÃ¼·Â Â÷ÀÌ
+	//	float gap1 = objs.people.at(0)->displayHP - objs.people.at(0)->HP;	//í‘œì‹œì²´ë ¥ê³¼ í˜„ì²´ë ¥ ì°¨ì´
 
 	//	printf("%f %f \n",temp1, temp2);
 
@@ -2136,24 +2136,24 @@ void DrawLifeBar() {
 	glTranslatef(0, 0, -0.1);
 	//		glRasterPos2f(0.0,-10);
 
-	glEnable(GL_LIGHT7);	//¹à°Ô ÇÏ±â¿ë ±¤¿ø
+	glEnable(GL_LIGHT7);	//ë°ê²Œ í•˜ê¸°ìš© ê´‘ì›
 
 	glBegin(GL_LINE_LOOP);
 	glColor4f(1.0, 1.0, 1.0, 1);
-	glLineWidth(2);	//¾È¸ÔÈû
+	glLineWidth(2);	//ì•ˆë¨¹í˜
 	glVertex3f(-0.90, 0.90, 0);
 	glVertex3f(-0.90, 0.80, 0);
 	glVertex3f(-0.08, 0.80, 0);
 	glVertex3f(-0.08, 0.90, 0);
 	glEnd();
 
-	//glMaterialfv(GL_FRONT, GL_AMBIENT, mAmbi);		//¹°Ã¼Æ¯¼º ¼ÂÆÃ
+	//glMaterialfv(GL_FRONT, GL_AMBIENT, mAmbi);		//ë¬¼ì²´íŠ¹ì„± ì…‹íŒ…
 	//glMaterialfv(GL_FRONT, GL_DIFFUSE, mDiff);
 	//glMaterialfv(GL_FRONT, GL_SPECULAR, mSpec);
-	glMateriali(GL_FRONT, GL_SHININESS, 0);		//¹İ»çÁ¤µµ ÁöÁ¤
+	glMateriali(GL_FRONT, GL_SHININESS, 0);		//ë°˜ì‚¬ì •ë„ ì§€ì •
 
 	glBegin(GL_QUADS);
-	glColor4f(119 / 255.0, 213 / 255.0, 253 / 255.0, 1);	//ÆÄ¶û
+	glColor4f(119 / 255.0, 213 / 255.0, 253 / 255.0, 1);	//íŒŒë‘
 	glVertex3f(-0.899, 0.899, 0);
 	glVertex3f(-0.899, 0.801, 0);
 	glVertex3f(-0.899 + lifeDot * objs.people.at(0)->HP, 0.801, 0);
@@ -2163,7 +2163,7 @@ void DrawLifeBar() {
 
 	if (objs.people.at(0)->displayHP >= objs.people.at(0)->HP + 1) {
 		glBegin(GL_QUADS);
-		glColor3f(1.0, 0.0, 0.0);			//»¡°­
+		glColor3f(1.0, 0.0, 0.0);			//ë¹¨ê°•
 		glVertex3f(-0.899 + lifeDot * (objs.people.at(0)->HP + 1), 0.899, 0);
 		glVertex3f(-0.899 + lifeDot * (objs.people.at(0)->HP + 1), 0.801, 0);
 		glVertex3f(-0.899 + lifeDot * objs.people.at(0)->displayHP, 0.801, 0);
@@ -2171,7 +2171,7 @@ void DrawLifeBar() {
 		glEnd();
 	}
 
-	glDisable(GL_LIGHT7);		//ÅØ½ºÆ® ¹à°Ô ÇÏ±â¿ë ±¤¿ø ²û
+	glDisable(GL_LIGHT7);		//í…ìŠ¤íŠ¸ ë°ê²Œ í•˜ê¸°ìš© ê´‘ì› ë”
 
 //		printf("%f %f \n",temp1, temp2);
 
@@ -2189,7 +2189,7 @@ void DrawLifeBar() {
 	glPopMatrix();
 }
 
-//EndÃâ·Â
+//Endì¶œë ¥
 void RenderEnd() {
 
 	glMatrixMode(GL_PROJECTION);
@@ -2198,8 +2198,8 @@ void RenderEnd() {
 	glPushMatrix();
 
 	glTranslatef(0, 0, -0.1);
-	//		glEnable(GL_LIGHT7);	//¹à°Ô ÇÏ±â¿ë ±¤¿ø
-	//		glMateriali(GL_FRONT, GL_SHININESS, 255);		//¹İ»çÁ¤µµ ÁöÁ¤
+	//		glEnable(GL_LIGHT7);	//ë°ê²Œ í•˜ê¸°ìš© ê´‘ì›
+	//		glMateriali(GL_FRONT, GL_SHININESS, 255);		//ë°˜ì‚¬ì •ë„ ì§€ì •
 
 	RenderText("  END", -0.1, 0.005);
 
@@ -2207,57 +2207,57 @@ void RenderEnd() {
 	glPopMatrix();
 }
 
-//Å¸ÀÌ¸Ó (¸ÅÅ¸ÀÓ Ã¼Å©µ¿ÀÛ)
+//íƒ€ì´ë¨¸ (ë§¤íƒ€ì„ ì²´í¬ë™ì‘)
 void MyTimer(int Value) {
-	//printf("p1x = %f p1y = %f p1z = %f \n", p1x, p1y, p1z);//À§Ä¡º¸±â
+	//printf("p1x = %f p1y = %f p1z = %f \n", p1x, p1y, p1z);//ìœ„ì¹˜ë³´ê¸°
 
 	for (int i = 0; i < 4; i++) {
-		if (objs.people.at(0)->keyDoubleTouch[i] > 0) {//Å° ´õºíÀÔ·Â °¨Áö½Ã°£ -1
+		if (objs.people.at(0)->keyDoubleTouch[i] > 0) {//í‚¤ ë”ë¸”ì…ë ¥ ê°ì§€ì‹œê°„ -1
 			objs.people.at(0)->keyDoubleTouch[i]--;
 		}
-		if (objs.people.at(0)->keyDoubleTouch[i] <= 0 && objs.people.at(0)->keyDoubleTouchLevel[i] != -1) {	//°¨Áö½Ã°£ ´ÙµÇ¸é °¨Áö·¹º§ -1·Î
+		if (objs.people.at(0)->keyDoubleTouch[i] <= 0 && objs.people.at(0)->keyDoubleTouchLevel[i] != -1) {	//ê°ì§€ì‹œê°„ ë‹¤ë˜ë©´ ê°ì§€ë ˆë²¨ -1ë¡œ
 			objs.people.at(0)->keyDoubleTouchLevel[i] = -1;
 		}
-		if (objs.people.at(0)->keyHold[i] == 0 && objs.people.at(0)->keyDoubleTouchLevel[i] == -1) {	//°¨Áö·¹º§ -1ÀÌ¸é, Å°¶¾ »óÅÂ¿¡¼­ 0À¸·Î.
+		if (objs.people.at(0)->keyHold[i] == 0 && objs.people.at(0)->keyDoubleTouchLevel[i] == -1) {	//ê°ì§€ë ˆë²¨ -1ì´ë©´, í‚¤ë—€ ìƒíƒœì—ì„œ 0ìœ¼ë¡œ.
 			objs.people.at(0)->keyDoubleTouchLevel[i] = 0;
 		}
 
 	}
 
-	if (isPaused == false) {	//ÀÏ½ÃÁ¤Áö ¾Æ´Ò½Ã
-		if (objs.people.at(0)->keyHold[0] || objs.people.at(0)->keyHold[1] || objs.people.at(0)->keyHold[2] || objs.people.at(0)->keyHold[3]) {	//¹æÇâÅ°Áß ÇÏ³ª ´­·ÈÀ¸¸é
-			p1ActionChange();		//Çàµ¿½ÃÅ´
+	if (isPaused == false) {	//ì¼ì‹œì •ì§€ ì•„ë‹ì‹œ
+		if (objs.people.at(0)->keyHold[0] || objs.people.at(0)->keyHold[1] || objs.people.at(0)->keyHold[2] || objs.people.at(0)->keyHold[3]) {	//ë°©í–¥í‚¤ì¤‘ í•˜ë‚˜ ëˆŒë ¸ìœ¼ë©´
+			p1ActionChange();		//í–‰ë™ì‹œí‚´
 		}
 
 		//	printf("%d %d %d %d \n", objs.people.at(0)->AttKeyHold[0], objs.people.at(0)->AttKeyHold[1], objs.people.at(0)->AttKeyHold[2], objs.people.at(0)->AttKeyHold[3]);
 
-		for (unsigned int i = 0; i < objs.people.size(); i++) {	//»ç¶÷¹è¿­ µ¹¸ç
-			objs.people.at(i)->AlwaysDo();			//Ç×»ó½ÇÇàÇÔ¼ö È£Ãâ			
+		for (unsigned int i = 0; i < objs.people.size(); i++) {	//ì‚¬ëŒë°°ì—´ ëŒë©°
+			objs.people.at(i)->AlwaysDo();			//í•­ìƒì‹¤í–‰í•¨ìˆ˜ í˜¸ì¶œ			
 		}
 
-		for (int i = 0; i < 10; i++) {		//ÁÖÀÎ°ø Å¸°İ°Ë»ç
-			if (objs.people.at(0)->attacks[i][3] != 0) {		//ÁÖÀÎ°ø Å¸°İÆÇÁ¤µé
-				float ax = objs.people.at(0)->attacks[i][0];	//ÀÓ½Ãº¯¼ö ¼ÂÆÃ
+		for (int i = 0; i < 10; i++) {		//ì£¼ì¸ê³µ íƒ€ê²©ê²€ì‚¬
+			if (objs.people.at(0)->attacks[i][3] != 0) {		//ì£¼ì¸ê³µ íƒ€ê²©íŒì •ë“¤
+				float ax = objs.people.at(0)->attacks[i][0];	//ì„ì‹œë³€ìˆ˜ ì…‹íŒ…
 				float ay = objs.people.at(0)->attacks[i][1];
 				float az = objs.people.at(0)->attacks[i][2];
 				float ar = objs.people.at(0)->attacks[i][3];
 
-				for (unsigned int j = 1; j < objs.people.size(); j++) {//Àû¹è¿­ µ¹¸ç
+				for (unsigned int j = 1; j < objs.people.size(); j++) {//ì ë°°ì—´ ëŒë©°
 					bool isHit = false;
-					float hbx;	//ÀÓ½Ãº¯¼ö ¼ÂÆÃ(È÷Æ®ÇÑ ¸öÃ¼À§Ä¡)
+					float hbx;	//ì„ì‹œë³€ìˆ˜ ì…‹íŒ…(íˆíŠ¸í•œ ëª¸ì²´ìœ„ì¹˜)
 					float hby;
 					float hbz;
-					for (int k = 0; k < 10; k++) {		//¸öÃ¼ÆÇÁ¤°Ë»ç
-						if (objs.people.at(j)->bodies[k][3] != 0) {	//¸öÃ¼ÆÇÁ¤µé
-							float bx = objs.people.at(j)->bodies[k][0];	//ÀÓ½Ãº¯¼ö ¼ÂÆÃ
+					for (int k = 0; k < 10; k++) {		//ëª¸ì²´íŒì •ê²€ì‚¬
+						if (objs.people.at(j)->bodies[k][3] != 0) {	//ëª¸ì²´íŒì •ë“¤
+							float bx = objs.people.at(j)->bodies[k][0];	//ì„ì‹œë³€ìˆ˜ ì…‹íŒ…
 							float by = objs.people.at(j)->bodies[k][1];
 							float bz = objs.people.at(j)->bodies[k][2];
 							float br = objs.people.at(j)->bodies[k][3];
-							float dis = sqrt(pow(bx - ax, 2) + pow(by - ay, 2) + pow(bz - az, 2));//°Å¸®
+							float dis = sqrt(pow(bx - ax, 2) + pow(by - ay, 2) + pow(bz - az, 2));//ê±°ë¦¬
 
-							if (dis <= ar + br) {			//È÷Æ®
+							if (dis <= ar + br) {			//íˆíŠ¸
 								isHit = true;
-								hbx = bx;		//È÷Æ®À§Ä¡ ±â¾ï
+								hbx = bx;		//íˆíŠ¸ìœ„ì¹˜ ê¸°ì–µ
 								hby = by;
 								hbz = bz;
 
@@ -2271,9 +2271,9 @@ void MyTimer(int Value) {
 									angleSub += 360;
 								}
 
-								mciSendString(("stop " + currSound).c_str(), 0, 0, 0);//ÇöÀçÈ¿°úÀ½ ÁßÁö
+								mciSendString(("stop " + currSound).c_str(), 0, 0, 0);//í˜„ì¬íš¨ê³¼ìŒ ì¤‘ì§€
 
-								attAttr st;					//°ø°İÁ¤º¸ ±¸Á¶Ã¼ ¼³Á¤								
+								attAttr st;					//ê³µê²©ì •ë³´ êµ¬ì¡°ì²´ ì„¤ì •								
 								st.attackerBodyAngle = objs.people.at(0)->BodyAngle[2];
 								st.hitType = objs.people.at(0)->hitType;
 								if (angleSub > 270 || angleSub < 90) {
@@ -2288,17 +2288,17 @@ void MyTimer(int Value) {
 								st.upVel = objs.people.at(0)->hitAttr.upVel;
 								st.yAccel = objs.people.at(0)->hitAttr.yAccel;
 
-								currSound = objs.people.at(0)->hitAttr.hitSound;	//ÇöÀç È¿°úÀ½¼³Á¤
+								currSound = objs.people.at(0)->hitAttr.hitSound;	//í˜„ì¬ íš¨ê³¼ìŒì„¤ì •
 								mciSendString(("play " + currSound).c_str(), 0, 0, 0);//play sound
 
-								objs.people.at(j)->actNo = GETHIT;	//¸Â´Â µ¿ÀÛÀ¸·Î
+								objs.people.at(j)->actNo = GETHIT;	//ë§ëŠ” ë™ì‘ìœ¼ë¡œ
 								objs.people.at(j)->ctrl = 0;
 								objs.people.at(j)->hitAttr = st;
 							}
 						}
 					}
 
-					//Å¸°İÈ¿°ú ÆÄÆ¼Å¬»ı¼º
+					//íƒ€ê²©íš¨ê³¼ íŒŒí‹°í´ìƒì„±
 					if (isHit == true && isParticleDraw == true) {
 						for (int i = 0; i < MAX_PGENERATOR; i++) {
 							if (pGenerators[i].alive == false) {
@@ -2311,34 +2311,34 @@ void MyTimer(int Value) {
 			}
 		}
 
-		bool isWin = true;	//ÀÌ°å³ª
-		for (unsigned int j = 1; j < objs.people.size(); j++) {//Àû Å¸°İ°Ë»ç
-			if (objs.people.at(j)->manType != 10 && (objs.people.at(j)->HP > 0 || objs.people.at(j)->aniNo != ANI_LIEDOWN)) {//Àû ÇÑ¸íÀÌ¶óµµ »ì¾ÆÀÖÀ¸¸é
+		bool isWin = true;	//ì´ê²¼ë‚˜
+		for (unsigned int j = 1; j < objs.people.size(); j++) {//ì  íƒ€ê²©ê²€ì‚¬
+			if (objs.people.at(j)->manType != 10 && (objs.people.at(j)->HP > 0 || objs.people.at(j)->aniNo != ANI_LIEDOWN)) {//ì  í•œëª…ì´ë¼ë„ ì‚´ì•„ìˆìœ¼ë©´
 				isWin = false;
 			}
 
-			for (int k = 0; k < 10; k++) {		//Àû Å¸°İÆÇÁ¤¹è¿­
+			for (int k = 0; k < 10; k++) {		//ì  íƒ€ê²©íŒì •ë°°ì—´
 				if (objs.people.at(j)->attacks[k][3] != 0) {
-					float ax = objs.people.at(j)->attacks[k][0];	//ÀÓ½Ãº¯¼ö ¼ÂÆÃ
+					float ax = objs.people.at(j)->attacks[k][0];	//ì„ì‹œë³€ìˆ˜ ì…‹íŒ…
 					float ay = objs.people.at(j)->attacks[k][1];
 					float az = objs.people.at(j)->attacks[k][2];
 					float ar = objs.people.at(j)->attacks[k][3];
 
 					bool isHit = false;
-					float hbx;	//ÀÓ½Ãº¯¼ö ¼ÂÆÃ(È÷Æ®ÇÑ ¸öÃ¼À§Ä¡)
+					float hbx;	//ì„ì‹œë³€ìˆ˜ ì…‹íŒ…(íˆíŠ¸í•œ ëª¸ì²´ìœ„ì¹˜)
 					float hby;
 					float hbz;
-					for (int i = 0; i < 10; i++) {		//ÁÖÀÎ°ø ¸öÃ¼ÆÇÁ¤¹è¿­
-						if (objs.people.at(0)->bodies[i][3] != 0) {		//ÁÖÀÎ°ø ¸öÃ¼ÆÇÁ¤µé
-							float bx = objs.people.at(0)->bodies[i][0];	//ÀÓ½Ãº¯¼ö ¼ÂÆÃ
+					for (int i = 0; i < 10; i++) {		//ì£¼ì¸ê³µ ëª¸ì²´íŒì •ë°°ì—´
+						if (objs.people.at(0)->bodies[i][3] != 0) {		//ì£¼ì¸ê³µ ëª¸ì²´íŒì •ë“¤
+							float bx = objs.people.at(0)->bodies[i][0];	//ì„ì‹œë³€ìˆ˜ ì…‹íŒ…
 							float by = objs.people.at(0)->bodies[i][1];
 							float bz = objs.people.at(0)->bodies[i][2];
 							float br = objs.people.at(0)->bodies[i][3];
-							float dis = sqrt(pow(bx - ax, 2) + pow(by - ay, 2) + pow(bz - az, 2));//°Å¸®
+							float dis = sqrt(pow(bx - ax, 2) + pow(by - ay, 2) + pow(bz - az, 2));//ê±°ë¦¬
 
-							if (dis <= ar + br) {			//Àû°ø°İ È÷Æ®
+							if (dis <= ar + br) {			//ì ê³µê²© íˆíŠ¸
 								isHit = true;
-								hbx = bx;		//È÷Æ®À§Ä¡ ±â¾ï
+								hbx = bx;		//íˆíŠ¸ìœ„ì¹˜ ê¸°ì–µ
 								hby = by;
 								hbz = bz;
 
@@ -2350,9 +2350,9 @@ void MyTimer(int Value) {
 									angleSub += 360;
 								}
 
-								mciSendString(("stop " + currSound).c_str(), 0, 0, 0);//ÇöÀçÈ¿°úÀ½ ÁßÁö
+								mciSendString(("stop " + currSound).c_str(), 0, 0, 0);//í˜„ì¬íš¨ê³¼ìŒ ì¤‘ì§€
 
-								attAttr st;					//°ø°İÁ¤º¸ ±¸Á¶Ã¼ ¼³Á¤								
+								attAttr st;					//ê³µê²©ì •ë³´ êµ¬ì¡°ì²´ ì„¤ì •								
 								st.attackerBodyAngle = objs.people.at(j)->BodyAngle[2];
 								st.hitType = objs.people.at(j)->hitType;
 								if (angleSub > 270 || angleSub < 90) {
@@ -2367,7 +2367,7 @@ void MyTimer(int Value) {
 								st.upVel = objs.people.at(j)->hitAttr.upVel;
 								st.yAccel = objs.people.at(j)->hitAttr.yAccel;
 
-								currSound = objs.people.at(j)->hitAttr.hitSound;	//ÇöÀç È¿°úÀ½¼³Á¤
+								currSound = objs.people.at(j)->hitAttr.hitSound;	//í˜„ì¬ íš¨ê³¼ìŒì„¤ì •
 								mciSendString(("play " + currSound).c_str(), 0, 0, 0);//play sound
 
 								objs.people.at(0)->actNo = GETHIT;
@@ -2377,7 +2377,7 @@ void MyTimer(int Value) {
 						}
 					}
 
-					//Å¸°İÈ¿°ú ÆÄÆ¼Å¬»ı¼º
+					//íƒ€ê²©íš¨ê³¼ íŒŒí‹°í´ìƒì„±
 					if (isHit == true && isParticleDraw == true) {
 						for (int i = 0; i < MAX_PGENERATOR; i++) {
 							if (pGenerators[i].alive == false) {
@@ -2390,12 +2390,12 @@ void MyTimer(int Value) {
 			}
 		}
 
-		if (objs.gameState == 1 && isWin == true) {	//ÀûÀÌ°åÀ¸¸é			
-			objs.gameState = 2;			//ÀÌ±ä»óÅÂ
+		if (objs.gameState == 1 && isWin == true) {	//ì ì´ê²¼ìœ¼ë©´			
+			objs.gameState = 2;			//ì´ê¸´ìƒíƒœ
 		}
 
-		if (objs.gameState == 2 && objs.people.at(0)->actNo == IDLE) {	//ÀûÀÌ°åÀ¸¸é
-			Thread[0] = (HANDLE)_beginthreadex(NULL, 0, AniEnding, (void*)NULL, 0, &ThreadState[0]);	//½º·¹µå·Î ÇÔ¼öÈ£Ãâ
+		if (objs.gameState == 2 && objs.people.at(0)->actNo == IDLE) {	//ì ì´ê²¼ìœ¼ë©´
+			Thread[0] = (HANDLE)_beginthreadex(NULL, 0, AniEnding, (void*)NULL, 0, &ThreadState[0]);	//ìŠ¤ë ˆë“œë¡œ í•¨ìˆ˜í˜¸ì¶œ
 			objs.gameState = 3;
 		}
 
@@ -2417,113 +2417,113 @@ void MyTimer(int Value) {
 
 	glutPostRedisplay();
 
-	//	glutTimerFunc(14, MyTimer, 1);//Å¸ÀÌ¸Ó Àçµî·Ï. ÃÊ´ç 70ÇÁ·¹ÀÓ
-	glutTimerFunc(sleepSpeed, MyTimer, 1);//Å¸ÀÌ¸Ó Àçµî·Ï. ÃÊ´ç 60ÇÁ·¹ÀÓ
+	//	glutTimerFunc(14, MyTimer, 1);//íƒ€ì´ë¨¸ ì¬ë“±ë¡. ì´ˆë‹¹ 70í”„ë ˆì„
+	glutTimerFunc(sleepSpeed, MyTimer, 1);//íƒ€ì´ë¨¸ ì¬ë“±ë¡. ì´ˆë‹¹ 60í”„ë ˆì„
 }
 
-//ÀÎÆ®·Î ¾Ö´Ï¸ÅÀÌ¼Ç =================================================================
+//ì¸íŠ¸ë¡œ ì• ë‹ˆë§¤ì´ì…˜ =================================================================
 UINT WINAPI AniIntro(void* arg) {
 	objs.isAniControl = true;
 	objs.gameState = 0;
 
 	mciSendString(("stop " + soundBGM1).c_str(), 0, 0, 0);//stop bgm
 
-	for (unsigned int i = 0; i < objs.people.size(); i++) {//»ç¶÷¹è¿­ µ¹¸ç
-		objs.people.at(i)->actNo = MAIN_ANI;//¿òÁ÷ÀÏ »ç¶÷Àº ÀÌ »óÅÂ·Î ¼³Á¤.
+	for (unsigned int i = 0; i < objs.people.size(); i++) {//ì‚¬ëŒë°°ì—´ ëŒë©°
+		objs.people.at(i)->actNo = MAIN_ANI;//ì›€ì§ì¼ ì‚¬ëŒì€ ì´ ìƒíƒœë¡œ ì„¤ì •.
 
-		if (objs.people.at(i)->manType != 10) {			//¿©ÀÚ ¾Æ´Ï¸é
-			objs.people.at(i)->aniNo = ANI_MANSTANDING;	//¼­ÀÖ´Â µ¿ÀÛÀ¸·Î
-			objs.people.at(i)->AniHandler();				//µ¿ÀÛ¼Â
+		if (objs.people.at(i)->manType != 10) {			//ì—¬ì ì•„ë‹ˆë©´
+			objs.people.at(i)->aniNo = ANI_MANSTANDING;	//ì„œìˆëŠ” ë™ì‘ìœ¼ë¡œ
+			objs.people.at(i)->AniHandler();				//ë™ì‘ì…‹
 		}
 	}
 
-	Person* m = objs.people.at(0);	//»ç¶÷0 °¡¸®Å°´Â Æ÷ÀÎÅÍ
-	Person* m2 = objs.people.at(1);	//»ç¶÷1 °¡¸®Å°´Â Æ÷ÀÎÅÍ
-	Person* m3 = objs.people.at(2);	//»ç¶÷2 °¡¸®Å°´Â Æ÷ÀÎÅÍ
-	Person* w = objs.people.at(3);	//»ç¶÷3 °¡¸®Å°´Â Æ÷ÀÎÅÍ
+	Person* m = objs.people.at(0);	//ì‚¬ëŒ0 ê°€ë¦¬í‚¤ëŠ” í¬ì¸í„°
+	Person* m2 = objs.people.at(1);	//ì‚¬ëŒ1 ê°€ë¦¬í‚¤ëŠ” í¬ì¸í„°
+	Person* m3 = objs.people.at(2);	//ì‚¬ëŒ2 ê°€ë¦¬í‚¤ëŠ” í¬ì¸í„°
+	Person* w = objs.people.at(3);	//ì‚¬ëŒ3 ê°€ë¦¬í‚¤ëŠ” í¬ì¸í„°
 
 	if (isBgmPlay == true) {
 	}
 
-	//°É¾î°¨------------------------------------------------------	
+	//ê±¸ì–´ê°------------------------------------------------------	
 	timer2 = 0;
 	m->timer = 0;
-	m->aniNo = ANI_WALK;		//°È´Â µ¿ÀÛ
+	m->aniNo = ANI_WALK;		//ê±·ëŠ” ë™ì‘
 	float tempX = 0;
-	isCanMouse = false;		//È¸ÀüÁß ¸¶¿ì½º Á¦¾î
-	MyMouseMove2(0, 0, 0, 0);	//°­Á¦ ¸¶¿ì½ºÅ¬¸¯
+	isCanMouse = false;		//íšŒì „ì¤‘ ë§ˆìš°ìŠ¤ ì œì–´
+	MyMouseMove2(0, 0, 0, 0);	//ê°•ì œ ë§ˆìš°ìŠ¤í´ë¦­
 	do {
-		m->movePosFoward(m->walkSpeed);//¾ÕÀ¸·Î ÀÌµ¿
-		m->AniHandler();				//¾Ö´Ï ½ÃÅ´
+		m->movePosFoward(m->walkSpeed);//ì•ìœ¼ë¡œ ì´ë™
+		m->AniHandler();				//ì• ë‹ˆ ì‹œí‚´
 
 		if (timer2 < 60) {
 
 			tempX += 6;
-			//			EyePosChange(tempX, 0);		//°¢µµº¯È­			
-			//			CalculateRadius();	//¸¶¿ì½º ¶À È¿°ú
-			MyMotion2(tempX, 0);		//°­Á¦ ¸¶¿ì½ºÀÌµ¿(½ÃÁ¡È¸Àü)
+			//			EyePosChange(tempX, 0);		//ê°ë„ë³€í™”			
+			//			CalculateRadius();	//ë§ˆìš°ìŠ¤ ë—Œ íš¨ê³¼
+			MyMotion2(tempX, 0);		//ê°•ì œ ë§ˆìš°ìŠ¤ì´ë™(ì‹œì íšŒì „)
 		}
 		if (timer2 == 60) {
-			MyMouseMove2(0, 1, 0, 0);	//°­Á¦ ¸¶¿ì½º¶À
-			isCanMouse = true;		//¸¶¿ì½º Á¦¾î
+			MyMouseMove2(0, 1, 0, 0);	//ê°•ì œ ë§ˆìš°ìŠ¤ë—Œ
+			isCanMouse = true;		//ë§ˆìš°ìŠ¤ ì œì–´
 		}
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 140);	//³¡³ª´Â ½Ã°£¼³Á¤(60 = 1ÃÊ)
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 140);	//ëë‚˜ëŠ” ì‹œê°„ì„¤ì •(60 = 1ì´ˆ)
 
-	//------¸ØÃç¼¶
+	//------ë©ˆì¶°ì„¬
 	timer2 = 0;
 	m->timer = 0;
 	m->aniNo = ANI_MANSTANDING;
 	mciSendString(("play " + soundVoice01).c_str(), 0, 0, 0);	//voice01
 	do {
-		m->AniHandler();				//¾Ö´Ï ½ÃÅ´
+		m->AniHandler();				//ì• ë‹ˆ ì‹œí‚´
 
 		if (timer2 < 70) {
-			m->HeadAngle[2] += 1;	//°í°³µ¹¸²
+			m->HeadAngle[2] += 1;	//ê³ ê°œëŒë¦¼
 		}
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 140);	//³¡³ª´Â ½Ã°£¼³Á¤
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 140);	//ëë‚˜ëŠ” ì‹œê°„ì„¤ì •
 
-	//------´Ù½Ã °È±â ½ÃÀÛ
+	//------ë‹¤ì‹œ ê±·ê¸° ì‹œì‘
 	timer2 = 0;
 	m->timer = 0;
-	m->aniNo = ANI_WALK;		//°È´Â µ¿ÀÛ
+	m->aniNo = ANI_WALK;		//ê±·ëŠ” ë™ì‘
 	do {
 
-		m->movePosFoward(m->walkSpeed);//¾ÕÀ¸·Î ÀÌµ¿
-		m->AniHandler();				//¾Ö´Ï ½ÃÅ´
+		m->movePosFoward(m->walkSpeed);//ì•ìœ¼ë¡œ ì´ë™
+		m->AniHandler();				//ì• ë‹ˆ ì‹œí‚´
 
 		if (timer2 < 35) {
 			m->HeadAngle[2] -= 2;
 			m->BodyAngle[2] += 2;
 		}
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 35);	//³¡³ª´Â ½Ã°£¼³Á¤
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 35);	//ëë‚˜ëŠ” ì‹œê°„ì„¤ì •
 
-	//------´Ş·Á°¨
+	//------ë‹¬ë ¤ê°
 	timer2 = 0;
 	m->timer = 0;
-	m->aniNo = ANI_RUN;		//´Ş¸®´Â µ¿ÀÛ
+	m->aniNo = ANI_RUN;		//ë‹¬ë¦¬ëŠ” ë™ì‘
 	do {
-		m->movePosFoward(m->runSpeed);//¾ÕÀ¸·Î ÀÌµ¿
-		m->AniHandler();				//¾Ö´Ï ½ÃÅ´
+		m->movePosFoward(m->runSpeed);//ì•ìœ¼ë¡œ ì´ë™
+		m->AniHandler();				//ì• ë‹ˆ ì‹œí‚´
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 145);	//³¡³ª´Â ½Ã°£¼³Á¤(60 = 1ÃÊ)
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 145);	//ëë‚˜ëŠ” ì‹œê°„ì„¤ì •(60 = 1ì´ˆ)
 
-	//------¸ØÃã
-	objs.people.at(0)->x = -40.6;//ÀÓ½Ã
+	//------ë©ˆì¶¤
+	objs.people.at(0)->x = -40.6;//ì„ì‹œ
 	objs.people.at(0)->z = -38;//
-	objs.EyeX = objs.people.at(0)->x + 10;		//½ÃÁ¡¼Â
+	objs.EyeX = objs.people.at(0)->x + 10;		//ì‹œì ì…‹
 	objs.EyeZ = objs.people.at(0)->z; // + 5;
-	objs.AtX = objs.people.at(0)->x;		//ÃÊÁ¡¼Â
+	objs.AtX = objs.people.at(0)->x;		//ì´ˆì ì…‹
 	objs.AtZ = objs.people.at(0)->z;
 	m->BodyAngle[2] = 70;
 
@@ -2534,58 +2534,58 @@ UINT WINAPI AniIntro(void* arg) {
 	do {
 		m->BodyAngle[2] += 1;
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 20);	//³¡³ª´Â ½Ã°£¼³Á¤(60 = 1ÃÊ)
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 20);	//ëë‚˜ëŠ” ì‹œê°„ì„¤ì •(60 = 1ì´ˆ)
 
 	timer2 = 0;
-	mciSendString(("play " + soundVoice02).c_str(), 0, 0, 0);	//voice - ³ÊÈñµé¹¹
+	mciSendString(("play " + soundVoice02).c_str(), 0, 0, 0);	//voice - ë„ˆí¬ë“¤ë­
 	tempX = 0;
-	isCanMouse = false;		//È¸ÀüÁß ¸¶¿ì½º Á¦¾î
-	MyMouseMove2(0, 0, 0, 0);	//°­Á¦ ¸¶¿ì½ºÅ¬¸¯
+	isCanMouse = false;		//íšŒì „ì¤‘ ë§ˆìš°ìŠ¤ ì œì–´
+	MyMouseMove2(0, 0, 0, 0);	//ê°•ì œ ë§ˆìš°ìŠ¤í´ë¦­
 	do {
 		if (((objs.eyeAngleX < 170 && objs.eyeAngleX > 10) || (objs.eyeAngleX > -170 && objs.eyeAngleX < -10)) && timer2 < 59) {
 			tempX += 6;
-			MyMotion2(tempX, 0);		//°­Á¦ ¸¶¿ì½ºÀÌµ¿(½ÃÁ¡È¸Àü)
+			MyMotion2(tempX, 0);		//ê°•ì œ ë§ˆìš°ìŠ¤ì´ë™(ì‹œì íšŒì „)
 		}
 		if (timer2 == 59) {
-			MyMouseMove2(0, 1, 0, 0);	//°­Á¦ ¸¶¿ì½º¶À
-			isCanMouse = true;		//¸¶¿ì½º Á¦¾î
+			MyMouseMove2(0, 1, 0, 0);	//ê°•ì œ ë§ˆìš°ìŠ¤ë—Œ
+			isCanMouse = true;		//ë§ˆìš°ìŠ¤ ì œì–´
 		}
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬		
-	} while (timer2 < 70);	//³¡³ª´Â ½Ã°£¼³Á¤(60 = 1ÃÊ)
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°		
+	} while (timer2 < 70);	//ëë‚˜ëŠ” ì‹œê°„ì„¤ì •(60 = 1ì´ˆ)
 
-	//------Àû µ¹¾Æ¼¶
+	//------ì  ëŒì•„ì„¬
 	timer2 = 0;
 	do {
 
-		//		m->movePosFoward(m->runSpeed);//¾ÕÀ¸·Î ÀÌµ¿
-		//		m->AniHandler();				//¾Ö´Ï ½ÃÅ´
+		//		m->movePosFoward(m->runSpeed);//ì•ìœ¼ë¡œ ì´ë™
+		//		m->AniHandler();				//ì• ë‹ˆ ì‹œí‚´
 
 		m2->BodyAngle[2] -= 5;
 		m3->BodyAngle[2] += 7;
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 20);	//³¡³ª´Â ½Ã°£¼³Á¤(60 = 1ÃÊ)
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 20);	//ëë‚˜ëŠ” ì‹œê°„ì„¤ì •(60 = 1ì´ˆ)
 
 	timer2 = 0;
-	mciSendString(("play " + soundVoice03).c_str(), 0, 0, 0);	//voice - ½Å°æ²¨
+	mciSendString(("play " + soundVoice03).c_str(), 0, 0, 0);	//voice - ì‹ ê²½êº¼
 	do {
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 60);	//³¡³ª´Â ½Ã°£¼³Á¤(60 = 1ÃÊ)
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 60);	//ëë‚˜ëŠ” ì‹œê°„ì„¤ì •(60 = 1ì´ˆ)
 
 	timer2 = 0;
-	mciSendString(("play " + soundVoice04).c_str(), 0, 0, 0);	//voice - ¿©·¯¸íÀÌ¼­
+	mciSendString(("play " + soundVoice04).c_str(), 0, 0, 0);	//voice - ì—¬ëŸ¬ëª…ì´ì„œ
 	do {
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 60);	//³¡³ª´Â ½Ã°£¼³Á¤(60 = 1ÃÊ)
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 60);	//ëë‚˜ëŠ” ì‹œê°„ì„¤ì •(60 = 1ì´ˆ)
 
-	//------°í°³µ¹¸²
+	//------ê³ ê°œëŒë¦¼
 	timer2 = 0;
 	do {
 		if (timer2 >= 60 && timer2 < 80) {
@@ -2595,43 +2595,43 @@ UINT WINAPI AniIntro(void* arg) {
 			m->HeadAngle[2] -= 1;
 		}
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 160);	//³¡³ª´Â ½Ã°£¼³Á¤(60 = 1ÃÊ)
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 160);	//ëë‚˜ëŠ” ì‹œê°„ì„¤ì •(60 = 1ì´ˆ)
 
 	timer2 = 0;
-	mciSendString(("play " + soundVoice05).c_str(), 0, 0, 0);	//voice - ÀÎÁö ¾Æ´ÑÁö´Â
+	mciSendString(("play " + soundVoice05).c_str(), 0, 0, 0);	//voice - ì¸ì§€ ì•„ë‹Œì§€ëŠ”
 	do {
 		if (timer2 == 120) {
 			mciSendString(("play " + soundVoice06).c_str(), 0, 0, 0);	//voice
 		}
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 200);	//³¡³ª´Â ½Ã°£¼³Á¤(60 = 1ÃÊ)
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 200);	//ëë‚˜ëŠ” ì‹œê°„ì„¤ì •(60 = 1ì´ˆ)
 
 	timer2 = 0;
 	mciSendString(("play " + soundVoice07).c_str(), 0, 0, 0);	//voice
 	do {
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 240);	//³¡³ª´Â ½Ã°£¼³Á¤(60 = 1ÃÊ)
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 240);	//ëë‚˜ëŠ” ì‹œê°„ì„¤ì •(60 = 1ì´ˆ)
 
 	timer2 = 0;
 	mciSendString(("play " + soundVoice08).c_str(), 0, 0, 0);	//voice
 	do {
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 120);	//³¡³ª´Â ½Ã°£¼³Á¤(60 = 1ÃÊ)
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 120);	//ëë‚˜ëŠ” ì‹œê°„ì„¤ì •(60 = 1ì´ˆ)
 
 
-	//------½ÃÀÛ
+	//------ì‹œì‘
 	objs.gametime = 0;
 	isLifeBarDraw = true;
 	if (isBgmPlay == true) {
 		mciSendString(("play " + soundBGM1 + " repeat").c_str(), 0, 0, 0);//play bgm
 	}
 
-	for (unsigned int i = 1; i < objs.people.size(); i++) {//»ç¶÷¹è¿­ µ¹¸ç
+	for (unsigned int i = 1; i < objs.people.size(); i++) {//ì‚¬ëŒë°°ì—´ ëŒë©°
 		if (objs.people.at(i)->manType != 10) {
 			objs.people.at(i)->actNo = IDLE;
 			objs.people.at(i)->ctrl = 1;
@@ -2639,44 +2639,44 @@ UINT WINAPI AniIntro(void* arg) {
 			objs.people.at(i)->HP = 500;
 		}
 	}
-	objs.people.at(0)->actNo = IDLE;	//ÁÖÀÎ°ø ¿òÁ÷ÀÏ ¼ö ÀÖ°Ô
+	objs.people.at(0)->actNo = IDLE;	//ì£¼ì¸ê³µ ì›€ì§ì¼ ìˆ˜ ìˆê²Œ
 	objs.people.at(0)->ctrl = 1;
 	objs.people.at(0)->HP = 1000;
 
-	objs.gameState = 1;	//°ÔÀÓÆÄÆ® ÁßÀÎ°¡
-	objs.isAniControl = false;	//¾Ö´ÏÁ¦¾î off
+	objs.gameState = 1;	//ê²Œì„íŒŒíŠ¸ ì¤‘ì¸ê°€
+	objs.isAniControl = false;	//ì• ë‹ˆì œì–´ off
 	return 0;
-}//-------------------ÀÎÆ®·Î ¾Ö´Ï ³¡
+}//-------------------ì¸íŠ¸ë¡œ ì• ë‹ˆ ë
 
-//¿£µù ¾Ö´Ï¸ÅÀÌ¼Ç =================================================================
+//ì—”ë”© ì• ë‹ˆë§¤ì´ì…˜ =================================================================
 UINT WINAPI AniEnding(void* arg) {
-	float destPosX;			//ÀÓ½Ã ¸ñÇ¥x
-	float destPosZ;			//ÀÓ½Ã ¸ñÇ¥z
-	float timerDest[5];		//ÀÓ½Ã ½Ã°¢ ¹è¿­
-	float timerCut[5];		//ÀÓ½Ã ½Ã°¢ ¹è¿­
-	float angleDis;			//ÀÓ½Ã ¸ñÇ¥°¢
-	float angleSub;			//ÀÓ½Ã °¢µµÂ÷ÀÌ
-	float posDis;			//ÀÓ½Ã ÁÂÇ¥Â÷ÀÌ
-	float tempX = 0;		//½ÃÁ¡È¸Àü¿ë ÀÓ½Ãº¯¼ö
+	float destPosX;			//ì„ì‹œ ëª©í‘œx
+	float destPosZ;			//ì„ì‹œ ëª©í‘œz
+	float timerDest[5];		//ì„ì‹œ ì‹œê° ë°°ì—´
+	float timerCut[5];		//ì„ì‹œ ì‹œê° ë°°ì—´
+	float angleDis;			//ì„ì‹œ ëª©í‘œê°
+	float angleSub;			//ì„ì‹œ ê°ë„ì°¨ì´
+	float posDis;			//ì„ì‹œ ì¢Œí‘œì°¨ì´
+	float tempX = 0;		//ì‹œì íšŒì „ìš© ì„ì‹œë³€ìˆ˜
 	float tempY = 0;
 
 	isLifeBarDraw = false;
 	objs.isAniControl = true;
 	objs.gameState = 3;
-	Person* m = objs.people.at(0);	//ÁÖÀÎ°ø Æ÷ÀÎÅÍ ¼ÂÆÃ
-	Person* w = NULL;			//¿©ÀÚ Æ÷ÀÎÅÍ
+	Person* m = objs.people.at(0);	//ì£¼ì¸ê³µ í¬ì¸í„° ì…‹íŒ…
+	Person* w = NULL;			//ì—¬ì í¬ì¸í„°
 
 	mciSendString(("stop " + soundBGM1).c_str(), 0, 0, 0);//stop bgm
 
-	for (unsigned int i = 0; i < objs.people.size(); i++) {//»ç¶÷¹è¿­ µ¹¸ç
-		objs.people.at(i)->actNo = MAIN_ANI;//¿òÁ÷ÀÏ »ç¶÷Àº ÀÌ »óÅÂ·Î ¼³Á¤.
+	for (unsigned int i = 0; i < objs.people.size(); i++) {//ì‚¬ëŒë°°ì—´ ëŒë©°
+		objs.people.at(i)->actNo = MAIN_ANI;//ì›€ì§ì¼ ì‚¬ëŒì€ ì´ ìƒíƒœë¡œ ì„¤ì •.
 		objs.people.at(i)->ctrl = 0;
 		if (objs.people.at(i)->manType == 10) {
-			w = objs.people.at(i);	//¿©ÀÚ Æ÷ÀÎÅÍ ¼ÂÆÃ
+			w = objs.people.at(i);	//ì—¬ì í¬ì¸í„° ì…‹íŒ…
 		}
 	}
 
-	if (w == NULL) {	//¿©ÀÚ ¾øÀ¸¸é ¸®ÅÏ
+	if (w == NULL) {	//ì—¬ì ì—†ìœ¼ë©´ ë¦¬í„´
 		return 0;
 	}
 	else {
@@ -2684,176 +2684,176 @@ UINT WINAPI AniEnding(void* arg) {
 		w->ctrl = 0;
 	}
 
-	//³²ÀÚ °ÉÀ¸¸ç È¸Àü------------------------------------------------------	
+	//ë‚¨ì ê±¸ìœ¼ë©° íšŒì „------------------------------------------------------	
 	timer2 = 0;
 	m->timer = 0;
-	m->aniNo = ANI_WALK;		//°È´Â µ¿ÀÛ
+	m->aniNo = ANI_WALK;		//ê±·ëŠ” ë™ì‘
 //	tempX = 0;
-//	isCanMouse = false;		//È¸ÀüÁß ¸¶¿ì½º Á¦¾î
-//	MyMouseMove2(0, 0, 0, 0);	//°­Á¦ ¸¶¿ì½ºÅ¬¸¯
-	destPosX = w->x + 3;		//¸ñÇ¥À§Ä¡
+//	isCanMouse = false;		//íšŒì „ì¤‘ ë§ˆìš°ìŠ¤ ì œì–´
+//	MyMouseMove2(0, 0, 0, 0);	//ê°•ì œ ë§ˆìš°ìŠ¤í´ë¦­
+	destPosX = w->x + 3;		//ëª©í‘œìœ„ì¹˜
 	destPosZ = w->z;
 	do {
-		angleDis = m->getP2AngleXY(destPosX, destPosZ);	//ÁÂÇ¥¹Ş¾Æ, ³ª·ÎºÎÅÍ ¿©ÀÚ°¡ ¸îµµ°¢µµ¿¡ ÀÖ³ª ±¸ÇÔ
-		angleSub = m->BodyAngle[2] - angleDis;	//°¢µµÂ÷
-		posDis = sqrt(pow(destPosX - m->x, 2) + pow(destPosZ - m->z, 2));	//°Å¸®±¸ÇÔ
+		angleDis = m->getP2AngleXY(destPosX, destPosZ);	//ì¢Œí‘œë°›ì•„, ë‚˜ë¡œë¶€í„° ì—¬ìê°€ ëª‡ë„ê°ë„ì— ìˆë‚˜ êµ¬í•¨
+		angleSub = m->BodyAngle[2] - angleDis;	//ê°ë„ì°¨
+		posDis = sqrt(pow(destPosX - m->x, 2) + pow(destPosZ - m->z, 2));	//ê±°ë¦¬êµ¬í•¨
 
-		m->rotateCheck(angleDis, rotateSpeed);			//¿©ÀÚ ÇâÇØ ¹æÇâÁ¤ÇØ È¸Àü
+		m->rotateCheck(angleDis, rotateSpeed);			//ì—¬ì í–¥í•´ ë°©í–¥ì •í•´ íšŒì „
 
-		if (posDis > 1) {						//°Å¸® Å¬¶§¸¸ ÀÌµ¿
-			m->movePosFoward(m->walkSpeed);//¾ÕÀ¸·Î ÀÌµ¿
+		if (posDis > 1) {						//ê±°ë¦¬ í´ë•Œë§Œ ì´ë™
+			m->movePosFoward(m->walkSpeed);//ì•ìœ¼ë¡œ ì´ë™
 		}
-		m->AniHandler();				//¾Ö´Ï ½ÃÅ´
+		m->AniHandler();				//ì• ë‹ˆ ì‹œí‚´
 
 //		if(timer2 < 60){
 
 //			tempX += 6;
-//			MyMotion2(tempX, 0);		//°­Á¦ ¸¶¿ì½ºÀÌµ¿(½ÃÁ¡È¸Àü)
+//			MyMotion2(tempX, 0);		//ê°•ì œ ë§ˆìš°ìŠ¤ì´ë™(ì‹œì íšŒì „)
 //		}
 //		if(timer2 == 60){
-//			MyMouseMove2(0, 1, 0, 0);	//°­Á¦ ¸¶¿ì½º¶À
-//			isCanMouse = true;		//¸¶¿ì½º Á¦¾î
+//			MyMouseMove2(0, 1, 0, 0);	//ê°•ì œ ë§ˆìš°ìŠ¤ë—Œ
+//			isCanMouse = true;		//ë§ˆìš°ìŠ¤ ì œì–´
 //		}
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 30);	//³¡³ª´Â ½Ã°£¼³Á¤(60 = 1ÃÊ)
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 30);	//ëë‚˜ëŠ” ì‹œê°„ì„¤ì •(60 = 1ì´ˆ)
 
-	//------³²ÀÚ ´Ş¸²
+	//------ë‚¨ì ë‹¬ë¦¼
 	mciSendString(("stop " + soundBGM1).c_str(), 0, 0, 0);//stop bgm
 	timer2 = 0;
 	m->timer = 0;
 	m->aniNo = ANI_RUN;
 	do {
-		angleDis = m->getP2AngleXY(destPosX, destPosZ);	//ÁÂÇ¥¹Ş¾Æ, ³ª·ÎºÎÅÍ ¿©ÀÚ°¡ ¸îµµ°¢µµ¿¡ ÀÖ³ª ±¸ÇÔ
-		posDis = sqrt(pow(destPosX - m->x, 2) + pow(destPosZ - m->z, 2));	//°Å¸®±¸ÇÔ
+		angleDis = m->getP2AngleXY(destPosX, destPosZ);	//ì¢Œí‘œë°›ì•„, ë‚˜ë¡œë¶€í„° ì—¬ìê°€ ëª‡ë„ê°ë„ì— ìˆë‚˜ êµ¬í•¨
+		posDis = sqrt(pow(destPosX - m->x, 2) + pow(destPosZ - m->z, 2));	//ê±°ë¦¬êµ¬í•¨
 
-		m->rotateCheck(angleDis, rotateSpeed);			//¹æÇâÁ¤ÇØ È¸Àü
+		m->rotateCheck(angleDis, rotateSpeed);			//ë°©í–¥ì •í•´ íšŒì „
 
-		m->movePosFoward(m->runSpeed);//¾ÕÀ¸·Î ÀÌµ¿
-		m->AniHandler();				//¾Ö´Ï ½ÃÅ´
+		m->movePosFoward(m->runSpeed);//ì•ìœ¼ë¡œ ì´ë™
+		m->AniHandler();				//ì• ë‹ˆ ì‹œí‚´
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (posDis > 0.5);	//Áö¼Ó Á¶°Ç¼³Á¤
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (posDis > 0.5);	//ì§€ì† ì¡°ê±´ì„¤ì •
 
-	//------¿©ÀÚ¾Õ¿¡¼­ ¸ØÃçÈ¸Àü
+	//------ì—¬ìì•ì—ì„œ ë©ˆì¶°íšŒì „
 	mciSendString(("stop " + soundBGM1).c_str(), 0, 0, 0);//stop bgm
 	timer2 = 0;
-	m->x = destPosX;		//ÁÂÇ¥¼Â
+	m->x = destPosX;		//ì¢Œí‘œì…‹
 	m->z = destPosZ;
 	m->timer = 0;
 	m->aniNo = ANI_MANSTANDING;
 	do {
-		angleDis = m->getP2AngleXY(w->x, w->z);	//ÁÂÇ¥¹Ş¾Æ, ³ª·ÎºÎÅÍ ¿©ÀÚÀÌ ¸îµµ°¢µµ¿¡ ÀÖ³ª ±¸ÇÔ
+		angleDis = m->getP2AngleXY(w->x, w->z);	//ì¢Œí‘œë°›ì•„, ë‚˜ë¡œë¶€í„° ì—¬ìì´ ëª‡ë„ê°ë„ì— ìˆë‚˜ êµ¬í•¨
 		angleSub = m->BodyAngle[2] - angleDis;
 
-		m->rotateCheck(angleDis, rotateSpeed);			//¹æÇâÁ¤ÇØ È¸Àü
+		m->rotateCheck(angleDis, rotateSpeed);			//ë°©í–¥ì •í•´ íšŒì „
 
-		m->AniHandler();				//¾Ö´Ï ½ÃÅ´
+		m->AniHandler();				//ì• ë‹ˆ ì‹œí‚´
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (angleSub > rotateSpeed || angleSub < -rotateSpeed);	//Áö¼Ó Á¶°Ç¼³Á¤
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (angleSub > rotateSpeed || angleSub < -rotateSpeed);	//ì§€ì† ì¡°ê±´ì„¤ì •
 
-	/////////////////ÀÓ½Ã///////////////
+	/////////////////ì„ì‹œ///////////////
 	//m->isHandCuffed = true;
-	//w->x = -49.1;		//ÁÂÇ¥¼Â
+	//w->x = -49.1;		//ì¢Œí‘œì…‹
 	//w->z = -36;	
 	//float disX;
 	//float disY;
-	//destPosX = -47;		//¸ñÇ¥À§Ä¡
+	//destPosX = -47;		//ëª©í‘œìœ„ì¹˜
 	//destPosZ = -36;
 	//objs.EyeX += destPosX - m->x;
 	//objs.EyeZ += destPosZ - m->z;
 	//objs.AtX += destPosX - m->x;
 	//objs.AtZ += destPosZ - m->z;	
-	//m->x = destPosX;		//ÁÂÇ¥¼Â
+	//m->x = destPosX;		//ì¢Œí‘œì…‹
 	//m->z = destPosZ;
 	//m->BodyAngle[2] = 90;
 	//m->aniNo = ANI_MANSTANDING;
-	//m->AniHandler();				//¾Ö´Ï ½ÃÅ´	
+	//m->AniHandler();				//ì• ë‹ˆ ì‹œí‚´	
 
-	//------¿©ÀÚº¸°í ¾ê±â
-	timerDest[0] = 30;		//¸ñÇ¥ Å¸ÀÓ
-	timerCut[0] = timerDest[0];//½Ã°£Â÷
+	//------ì—¬ìë³´ê³  ì–˜ê¸°
+	timerDest[0] = 30;		//ëª©í‘œ íƒ€ì„
+	timerCut[0] = timerDest[0];//ì‹œê°„ì°¨
 	timer2 = 0;
 	m->BodyAngle[2] = 90;
 	mciSendString(("play " + soundVoice09).c_str(), 0, 0, 0);	//voice
 	tempX = 0;
-	isCanMouse = false;		//È¸ÀüÁß ¸¶¿ì½º Á¦¾î
-	MyMouseMove2(0, 0, 0, 0);	//°­Á¦ ¸¶¿ì½ºÅ¬¸¯
+	isCanMouse = false;		//íšŒì „ì¤‘ ë§ˆìš°ìŠ¤ ì œì–´
+	MyMouseMove2(0, 0, 0, 0);	//ê°•ì œ ë§ˆìš°ìŠ¤í´ë¦­
 
 	do {
 		if (timer2 < timerDest[0]) {
-			m->LshoulderAngle[0] += 45 / timerCut[0];	//¿ŞÆÈ
-			m->LelbowAngle[0] += 10 / timerCut[0];	//¿ŞÆÈ		
-			m->LelbowAngle[1] += 35 / timerCut[0];	//¿ŞÆÈ					
+			m->LshoulderAngle[0] += 45 / timerCut[0];	//ì™¼íŒ”
+			m->LelbowAngle[0] += 10 / timerCut[0];	//ì™¼íŒ”		
+			m->LelbowAngle[1] += 35 / timerCut[0];	//ì™¼íŒ”					
 		}
 
 		if ((objs.eyeAngleX < 170 && objs.eyeAngleX > 10) || (objs.eyeAngleX > -170 && objs.eyeAngleX < -10)) {
 			tempX += 6;
-			MyMotion2(tempX, 0);		//°­Á¦ ¸¶¿ì½ºÀÌµ¿(½ÃÁ¡È¸Àü)
+			MyMotion2(tempX, 0);		//ê°•ì œ ë§ˆìš°ìŠ¤ì´ë™(ì‹œì íšŒì „)
 		}
 		if (timer2 == 59) {
-			MyMouseMove2(0, 1, 0, 0);	//°­Á¦ ¸¶¿ì½º¶À
-			isCanMouse = true;		//¸¶¿ì½º Á¦¾î
+			MyMouseMove2(0, 1, 0, 0);	//ê°•ì œ ë§ˆìš°ìŠ¤ë—Œ
+			isCanMouse = true;		//ë§ˆìš°ìŠ¤ ì œì–´
 		}
 
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 60);	//Áö¼Ó Á¶°Ç¼³Á¤
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 60);	//ì§€ì† ì¡°ê±´ì„¤ì •
 
-	//------¿©ÀÚ°É¾î¿È
+	//------ì—¬ìê±¸ì–´ì˜´
 	timer2 = 0;
 	w->aniNo = ANI_WALK;
 	do {
-		w->movePosFoward(0.03);//¾ÕÀ¸·Î ÀÌµ¿
-		w->AniHandler();				//¾Ö´Ï ½ÃÅ´
+		w->movePosFoward(0.03);//ì•ìœ¼ë¡œ ì´ë™
+		w->AniHandler();				//ì• ë‹ˆ ì‹œí‚´
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 30);	//Áö¼Ó Á¶°Ç¼³Á¤
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 30);	//ì§€ì† ì¡°ê±´ì„¤ì •
 
 
-	/////////////////ÀÓ½Ã///////////////
+	/////////////////ì„ì‹œ///////////////
 	//m->isHandCuffed = true;
-	//w->x = -49.1;		//ÁÂÇ¥¼Â
+	//w->x = -49.1;		//ì¢Œí‘œì…‹
 	//w->z = -36;	
 	//float disX;
 	//float disY;
-	//destPosX = -47;		//¸ñÇ¥À§Ä¡
+	//destPosX = -47;		//ëª©í‘œìœ„ì¹˜
 	//destPosZ = -36;
 	//objs.EyeX += destPosX - m->x;
 	//objs.EyeZ += destPosZ - m->z;
 	//objs.AtX += destPosX - m->x;
 	//objs.AtZ += destPosZ - m->z;	
-	//m->x = destPosX;		//ÁÂÇ¥¼Â
+	//m->x = destPosX;		//ì¢Œí‘œì…‹
 	//m->z = destPosZ;
 	//m->BodyAngle[2] = 90;
 	//m->aniNo = ANI_MANSTANDING;
-	//m->AniHandler();				//¾Ö´Ï ½ÃÅ´
+	//m->AniHandler();				//ì• ë‹ˆ ì‹œí‚´
 
 
-	//------¿©ÀÚ¼÷ÀÓ
-	timerDest[0] = 30;		//¸ñÇ¥ Å¸ÀÓ
-	timerDest[1] = 60;		//¸ñÇ¥ Å¸ÀÓ
-	timerCut[0] = timerDest[0];//½Ã°£Â÷
-	timerCut[1] = timerDest[1] - timerDest[0];//½Ã°£Â÷
+	//------ì—¬ììˆ™ì„
+	timerDest[0] = 30;		//ëª©í‘œ íƒ€ì„
+	timerDest[1] = 60;		//ëª©í‘œ íƒ€ì„
+	timerCut[0] = timerDest[0];//ì‹œê°„ì°¨
+	timerCut[1] = timerDest[1] - timerDest[0];//ì‹œê°„ì°¨
 	timer2 = 0;
 	w->aniNo = ANI_IDLE;
 	w->InitAngle();
 	do {
 		if (timer2 < timerDest[0]) {
-			w->WaistAngle[0] -= 45 / timerCut[0];	//Çã¸® ±ÁÈû
-			w->LshoulderAngle[0] += 80 / timerCut[0];	//¿ŞÆÈ
+			w->WaistAngle[0] -= 45 / timerCut[0];	//í—ˆë¦¬ êµ½í˜
+			w->LshoulderAngle[0] += 80 / timerCut[0];	//ì™¼íŒ”
 			w->LelbowAngle[0] += 20 / timerCut[0];
-			w->RelbowAngle[0] += 20 / timerCut[0];		//¿À¸¥ÆÈ
-			w->RelbowAngle[1] -= 35 / timerCut[0];		//¼Õ ÁÖ¸Ó´Ï¿¡
+			w->RelbowAngle[0] += 20 / timerCut[0];		//ì˜¤ë¥¸íŒ”
+			w->RelbowAngle[1] -= 35 / timerCut[0];		//ì† ì£¼ë¨¸ë‹ˆì—
 		}
 		else if (timer2 < timerDest[1]) {
-			w->WaistAngle[0] += 45 / timerCut[1];	//Çã¸® Æï
+			w->WaistAngle[0] += 45 / timerCut[1];	//í—ˆë¦¬ í„
 			w->LshoulderAngle[0] -= 60 / timerCut[1];
 			w->RshoulderAngle[0] += 35 / timerCut[1];
 			w->LelbowAngle[1] += 20 / timerCut[1];
@@ -2863,137 +2863,137 @@ UINT WINAPI AniEnding(void* arg) {
 			m->RelbowAngle[1] -= 35 / timerCut[0];
 		}
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 60);	//Áö¼Ó Á¶°Ç¼³Á¤
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 60);	//ì§€ì† ì¡°ê±´ì„¤ì •
 
-	//------¼ö°© Ã¤¿öÁü
+	//------ìˆ˜ê°‘ ì±„ì›Œì§
 	m->isHandCuffed = true;
 	timer2 = 0;
 	do {
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 60);	//Áö¼Ó Á¶°Ç¼³Á¤
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 60);	//ì§€ì† ì¡°ê±´ì„¤ì •
 
-	//------´ëÈ­	
+	//------ëŒ€í™”	
 	timer2 = 0;
-	tempX = 3;	//Â÷ ¼Óµµ
-	mciSendString(("play " + soundVoice10).c_str(), 0, 0, 0);	//voice ¹¹¾ß
+	tempX = 3;	//ì°¨ ì†ë„
+	mciSendString(("play " + soundVoice10).c_str(), 0, 0, 0);	//voice ë­ì•¼
 	do {
 		//	cout<<w->x<<" "<<w->z<<" "<<m->x<<" "<<m->z<<"\n";
 		if (timer2 == 60) {
-			mciSendString(("play " + soundVoice11).c_str(), 0, 0, 0);	//voice  °æÂû
+			mciSendString(("play " + soundVoice11).c_str(), 0, 0, 0);	//voice  ê²½ì°°
 		}
 		else if (timer2 == 120) {
-			mciSendString(("play " + soundVoice12).c_str(), 0, 0, 0);	//voice  ³Ê¸¦
+			mciSendString(("play " + soundVoice12).c_str(), 0, 0, 0);	//voice  ë„ˆë¥¼
 		}
 		else if (timer2 == 300) {
-			mciSendString(("play " + soundVoice14).c_str(), 0, 0, 0);	//voice  ¹¬ºñ±Ç
+			mciSendString(("play " + soundVoice14).c_str(), 0, 0, 0);	//voice  ë¬µë¹„ê¶Œ
 		}
 		else if (timer2 == 330) {
-			mciSendString(("play " + soundVoice13).c_str(), 0, 0, 0);	//voice  ¿ô±âÁö1
+			mciSendString(("play " + soundVoice13).c_str(), 0, 0, 0);	//voice  ì›ƒê¸°ì§€1
 		}
 		else if (timer2 == 420) {
-			mciSendString(("play " + soundVoice15).c_str(), 0, 0, 0);	//voice  ¿ô±âÁö2
+			mciSendString(("play " + soundVoice15).c_str(), 0, 0, 0);	//voice  ì›ƒê¸°ì§€2
 		}
 		else if (timer2 == 540) {
-			mciSendString(("play " + soundVoice16).c_str(), 0, 0, 0);	//voice  ÀÌ·±°æ¿ì
+			mciSendString(("play " + soundVoice16).c_str(), 0, 0, 0);	//voice  ì´ëŸ°ê²½ìš°
 		}
 		else if (timer2 == 660) {
-			mciSendString(("play " + soundVoice17).c_str(), 0, 0, 0);	//voice  ³ª»Û
+			mciSendString(("play " + soundVoice17).c_str(), 0, 0, 0);	//voice  ë‚˜ìœ
 		}
 		else if (timer2 == 770) {
-			mciSendString(("play " + soundVoice18).c_str(), 0, 0, 0);	//voice  Å¸
+			mciSendString(("play " + soundVoice18).c_str(), 0, 0, 0);	//voice  íƒ€
 		}
 
-		tempY = 500;	//ÀÓ½Ãº¯¼ö
-		//Â÷ ÀÌµ¿ºÎ
+		tempY = 500;	//ì„ì‹œë³€ìˆ˜
+		//ì°¨ ì´ë™ë¶€
 		if (timer2 == 0 + tempY) {
 			isCarDraw = true;
-			isCyren = true;		//»çÀÌ·»È¿°ú
+			isCyren = true;		//ì‚¬ì´ë Œíš¨ê³¼
 			car->pos.x = 0;
 			car->pos.z = 300;
 		}
 		else if (timer2 < 80 + tempY) {
-			car->movePosFoward(tempX);		//Â÷ ÁøÇà
+			car->movePosFoward(tempX);		//ì°¨ ì§„í–‰
 		}
 		else if (timer2 < 120 + tempY) {
 			tempX -= 0.02;
-			car->movePosFoward(tempX);		//Â÷ ¼Óµµ°¨¼ÒÇÏ¸ç ÁøÇà
+			car->movePosFoward(tempX);		//ì°¨ ì†ë„ê°ì†Œí•˜ë©° ì§„í–‰
 		}
 		else if (timer2 < 140 + tempY) {
 			tempX -= 0.24;
 			if (tempX > 0) {
-				car->movePosFoward(tempX);		//Â÷ ¼Óµµ°¨¼ÒÇÏ¸ç ÁøÇà
+				car->movePosFoward(tempX);		//ì°¨ ì†ë„ê°ì†Œí•˜ë©° ì§„í–‰
 			}
 			else {
-				car->movePosFoward(0.35);		//Â÷ ÁøÇà
+				car->movePosFoward(0.35);		//ì°¨ ì§„í–‰
 			}
 		}
 		else if (timer2 < 150 + tempY) {
 			tempX -= 0.04;
 			if (tempX > 0) {
-				car->movePosFoward(tempX);		//Â÷ ÁøÇà
+				car->movePosFoward(tempX);		//ì°¨ ì§„í–‰
 			}
 			else {
-				//				car->movePosFoward(0.5);		//Â÷ ÁøÇà
+				//				car->movePosFoward(0.5);		//ì°¨ ì§„í–‰
 			}
 		}
 		else if (timer2 > 150 + tempY && timer2 < 160 + tempY) {
 			car->movePosFoward(-0.3);
 		}
 
-		//Â÷ È¸ÀüºÎ
+		//ì°¨ íšŒì „ë¶€
 		if (timer2 >= 95 + tempY && timer2 < 140 + tempY) {
-			car->angles.y += 2.5;				//Â÷ È¸Àü
+			car->angles.y += 2.5;				//ì°¨ íšŒì „
 		}
 		else if (timer2 >= 140 + tempY && timer2 < 150 + tempY) {
 			if (car->angles.y + car->dAngle < 180 + tempY) {
-				car->dAngle += 7;				//Â÷ µå¸®ÇÁÆ®ÇÏ¸ç È¸Àü
+				car->dAngle += 7;				//ì°¨ ë“œë¦¬í”„íŠ¸í•˜ë©° íšŒì „
 			}
 		}
 		else if (timer2 == 150 + tempY) {
-			car->angles.y += car->dAngle;	//°¢ ¼ÂÆÃ
+			car->angles.y += car->dAngle;	//ê° ì…‹íŒ…
 			car->dAngle = 0;
 		}
 
 		if (timer2 == 65 + tempY) {
-			mciSendString(("play " + soundCarStop).c_str(), 0, 0, 0);	//Â÷¸ØÃß´ÂÀ½
+			mciSendString(("play " + soundCarStop).c_str(), 0, 0, 0);	//ì°¨ë©ˆì¶”ëŠ”ìŒ
 		}
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 830);	//Áö¼Ó ½Ã°£¼³Á¤
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 830);	//ì§€ì† ì‹œê°„ì„¤ì •
 
-	//------¹ßÂü
+	//------ë°œì°¸
 	timer2 = 0;
-	timerDest[0] = 10;		//¸ñÇ¥ Å¸ÀÓ
-	timerCut[0] = timerDest[0];//½Ã°£Â÷
+	timerDest[0] = 10;		//ëª©í‘œ íƒ€ì„
+	timerCut[0] = timerDest[0];//ì‹œê°„ì°¨
 	do {
-		w->LshoulderAngle[0] -= 20 / timerCut[0];	//¿ŞÆÈ		//ÆÈ ¿ø·¡´ë·Î
-		w->RshoulderAngle[0] -= 35 / timerCut[0];	//¿ŞÆÈ
+		w->LshoulderAngle[0] -= 20 / timerCut[0];	//ì™¼íŒ”		//íŒ” ì›ë˜ëŒ€ë¡œ
+		w->RshoulderAngle[0] -= 35 / timerCut[0];	//ì™¼íŒ”
 		w->LelbowAngle[0] -= 20 / timerCut[0];
 		w->LelbowAngle[1] -= 20 / timerCut[1];
-		w->RelbowAngle[0] -= 20 / timerCut[0];		//¿À¸¥ÆÈ
-		w->RelbowAngle[1] += 35 / timerCut[0];		//¼Õ ÁÖ¸Ó´Ï¿¡
+		w->RelbowAngle[0] -= 20 / timerCut[0];		//ì˜¤ë¥¸íŒ”
+		w->RelbowAngle[1] += 35 / timerCut[0];		//ì† ì£¼ë¨¸ë‹ˆì—
 
 		w->BodyAngle[0] += 45 / timerCut[0];
-		w->WaistAngle[0] -= 20 / timerCut[0];	//Çã¸® ±ÁÈû
+		w->WaistAngle[0] -= 20 / timerCut[0];	//í—ˆë¦¬ êµ½í˜
 
-		w->LlegAngle[0] -= 45 / timerCut[0];	//¿Ş´Ù¸®
-		w->RlegAngle[0] += 40 / timerCut[0];	//¿À¸¥´Ù¸®
+		w->LlegAngle[0] -= 45 / timerCut[0];	//ì™¼ë‹¤ë¦¬
+		w->RlegAngle[0] += 40 / timerCut[0];	//ì˜¤ë¥¸ë‹¤ë¦¬
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 10);	//Áö¼Ó ½Ã°£¼³Á¤
-	mciSendString(("play " + soundHit1).c_str(), 0, 0, 0);	//È÷Æ®À½
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 10);	//ì§€ì† ì‹œê°„ì„¤ì •
+	mciSendString(("play " + soundHit1).c_str(), 0, 0, 0);	//íˆíŠ¸ìŒ
 
-	//------³²ÀÚ ³¯¾Æ°¨
+	//------ë‚¨ì ë‚ ì•„ê°
 	timer2 = 0;
-	timerDest[0] = 30;		//¸ñÇ¥ Å¸ÀÓ
-	timerCut[0] = timerDest[0];//½Ã°£Â÷
-	float velY = 0.1;		//¼Óµµ
-	float addY = -0.0075;		//°¡¼Óµµ
+	timerDest[0] = 30;		//ëª©í‘œ íƒ€ì„
+	timerCut[0] = timerDest[0];//ì‹œê°„ì°¨
+	float velY = 0.1;		//ì†ë„
+	float addY = -0.0075;		//ê°€ì†ë„
 	do {
 		m->BodyAngle[0] -= 90 / timerCut[0];
 		m->BodyAngle[2] -= 180 / timerCut[0];
@@ -3008,113 +3008,113 @@ UINT WINAPI AniEnding(void* arg) {
 		m->y += velY;
 		velY += addY;
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 30);	//Áö¼Ó ½Ã°£¼³Á¤
-	m->isDraw = false;	//³²ÀÚ ¾È±×¸²
-	mciSendString(("play " + soundVoice19).c_str(), 0, 0, 0);	//voice ¸»µµ
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 30);	//ì§€ì† ì‹œê°„ì„¤ì •
+	m->isDraw = false;	//ë‚¨ì ì•ˆê·¸ë¦¼
+	mciSendString(("play " + soundVoice19).c_str(), 0, 0, 0);	//voice ë§ë„
 
-	//------¹ß ¿ø·¡´ë·Î
+	//------ë°œ ì›ë˜ëŒ€ë¡œ
 	timer2 = 0;
-	timerDest[0] = 10;		//¸ñÇ¥ Å¸ÀÓ
-	timerCut[0] = timerDest[0];//½Ã°£Â÷
+	timerDest[0] = 10;		//ëª©í‘œ íƒ€ì„
+	timerCut[0] = timerDest[0];//ì‹œê°„ì°¨
 	do {
 		w->BodyAngle[0] -= 45 / timerCut[0];
-		w->WaistAngle[0] += 20 / timerCut[0];	//Çã¸® ±ÁÈû
+		w->WaistAngle[0] += 20 / timerCut[0];	//í—ˆë¦¬ êµ½í˜
 
-		w->LlegAngle[0] += 45 / timerCut[0];	//¿Ş´Ù¸®
-		w->RlegAngle[0] -= 40 / timerCut[0];	//¿À¸¥´Ù¸®
+		w->LlegAngle[0] += 45 / timerCut[0];	//ì™¼ë‹¤ë¦¬
+		w->RlegAngle[0] -= 40 / timerCut[0];	//ì˜¤ë¥¸ë‹¤ë¦¬
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 10);	//Áö¼Ó ½Ã°£¼³Á¤
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 10);	//ì§€ì† ì‹œê°„ì„¤ì •
 
-	//------¿©ÀÚ °É¾î°¨
+	//------ì—¬ì ê±¸ì–´ê°
 	timer2 = 0;
 	w->aniNo = ANI_WALK;
 	do {
-		w->movePosFoward(w->walkSpeed / 2);//¾ÕÀ¸·Î ÀÌµ¿
-		w->AniHandler();				//¾Ö´Ï ½ÃÅ´
-		objs.AtX += w->walkSpeed / 2;		//ÃÊÁ¡ÀÌµ¿
+		w->movePosFoward(w->walkSpeed / 2);//ì•ìœ¼ë¡œ ì´ë™
+		w->AniHandler();				//ì• ë‹ˆ ì‹œí‚´
+		objs.AtX += w->walkSpeed / 2;		//ì´ˆì ì´ë™
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 60);	//Áö¼Ó ½Ã°£¼³Á¤
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 60);	//ì§€ì† ì‹œê°„ì„¤ì •
 
-	//------¿©ÀÚ ¼÷¿© Â÷¿¡ Å½
+	//------ì—¬ì ìˆ™ì—¬ ì°¨ì— íƒ
 	timer2 = 0;
 	w->aniNo = IDLE;
-	timerDest[0] = 30;		//¸ñÇ¥ Å¸ÀÓ
-	timerDest[1] = 60;		//¸ñÇ¥ Å¸ÀÓ
-	timerCut[0] = timerDest[0];//½Ã°£Â÷
-	timerCut[1] = timerDest[1] - timerDest[0];//½Ã°£Â÷
+	timerDest[0] = 30;		//ëª©í‘œ íƒ€ì„
+	timerDest[1] = 60;		//ëª©í‘œ íƒ€ì„
+	timerCut[0] = timerDest[0];//ì‹œê°„ì°¨
+	timerCut[1] = timerDest[1] - timerDest[0];//ì‹œê°„ì°¨
 	do {
 		if (timer2 < timerDest[0]) {
-			w->WaistAngle[0] -= 70 / timerCut[0];	//Çã¸® ±ÁÈû
+			w->WaistAngle[0] -= 70 / timerCut[0];	//í—ˆë¦¬ êµ½í˜
 		}
 		else if (timer2 < timerDest[1]) {
-			w->movePosFoward(w->walkSpeed / 2);//¾ÕÀ¸·Î ÀÌµ¿
-			objs.AtX += w->walkSpeed / 2;		//ÃÊÁ¡ÀÌµ¿
+			w->movePosFoward(w->walkSpeed / 2);//ì•ìœ¼ë¡œ ì´ë™
+			objs.AtX += w->walkSpeed / 2;		//ì´ˆì ì´ë™
 
-			w->LlegAngle[0] += 30 / timerCut[1];	//¿Ş´Ù¸®
-			w->RlegAngle[0] -= 30 / timerCut[1];	//¿À¸¥´Ù¸®
+			w->LlegAngle[0] += 30 / timerCut[1];	//ì™¼ë‹¤ë¦¬
+			w->RlegAngle[0] -= 30 / timerCut[1];	//ì˜¤ë¥¸ë‹¤ë¦¬
 		}
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 60);	//Áö¼Ó ½Ã°£¼³Á¤
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 60);	//ì§€ì† ì‹œê°„ì„¤ì •
 
-	w->isDraw = false;	//¿©ÀÚ ¾È±×¸²
+	w->isDraw = false;	//ì—¬ì ì•ˆê·¸ë¦¼
 
-	//------Â÷ ÀÌµ¿
+	//------ì°¨ ì´ë™
 	timer2 = 0;
 	tempX = 0;
 	do {
 		if (timer2 < 40) {
 			tempX -= 0.005;
-			car->movePosFoward(tempX);//Â÷ µÚ·Î 
+			car->movePosFoward(tempX);//ì°¨ ë’¤ë¡œ 
 
 			car->angles.y += 1;
 
 		}
 		else if (timer2 < 60) {
 			tempX += 0.01;
-			car->movePosFoward(tempX);//Â÷¾ÕÀ¸·Î
+			car->movePosFoward(tempX);//ì°¨ì•ìœ¼ë¡œ
 
 			car->angles.y += 1;
 		}
 		else if (timer2 < 120) {
 			tempX += 0.01;
-			car->movePosFoward(tempX);//Â÷ ¾ÕÀ¸·Î
+			car->movePosFoward(tempX);//ì°¨ ì•ìœ¼ë¡œ
 		}
 		else if (timer2 < 200) {
 			if (car->angles.y > 180) {
 				car->angles.y -= 1;
 			}
-			car->movePosFoward(tempX);//Â÷ ¾ÕÀ¸·Î
+			car->movePosFoward(tempX);//ì°¨ ì•ìœ¼ë¡œ
 		}
 		else if (timer2 < 720) {
-			car->movePosFoward(tempX);//Â÷ ¾ÕÀ¸·Î
+			car->movePosFoward(tempX);//ì°¨ ì•ìœ¼ë¡œ
 		}
 
-		//À½¼º ³ª¿À°Ô
+		//ìŒì„± ë‚˜ì˜¤ê²Œ
 		if (timer2 == 30) {
-			mciSendString(("play " + soundVoice20).c_str(), 0, 0, 0);	//voice ¹Ì¶õ´Ù
+			mciSendString(("play " + soundVoice20).c_str(), 0, 0, 0);	//voice ë¯¸ë€ë‹¤
 		}
 		else if (timer2 == 90) {
-			mciSendString(("play " + soundCarStart).c_str(), 0, 0, 0);	//Â÷°¨
+			mciSendString(("play " + soundCarStart).c_str(), 0, 0, 0);	//ì°¨ê°
 		}
 		else if (timer2 == 270) {
-			mciSendString(("play " + soundVoice21).c_str(), 0, 0, 0);	//voice ¸»µµ
+			mciSendString(("play " + soundVoice21).c_str(), 0, 0, 0);	//voice ë§ë„
 		}
 		else if (timer2 == 300) {
-			mciSendString(("play " + soundVoice22).c_str(), 0, 0, 0);	//voice ½Å°í
+			mciSendString(("play " + soundVoice22).c_str(), 0, 0, 0);	//voice ì‹ ê³ 
 		}
 		else if (timer2 == 360) {
-			mciSendString(("play " + soundVoice23).c_str(), 0, 0, 0);	//voice ½Å°í
+			mciSendString(("play " + soundVoice23).c_str(), 0, 0, 0);	//voice ì‹ ê³ 
 		}
 		else if (timer2 == 480) {
-			mciSendString(("play " + soundHit1).c_str(), 0, 0, 0);	//voice ½Å°í}
+			mciSendString(("play " + soundHit1).c_str(), 0, 0, 0);	//voice ì‹ ê³ }
 		}
 
 		objs.AtX = car->pos.x;
@@ -3124,22 +3124,22 @@ UINT WINAPI AniEnding(void* arg) {
 			objs.EyeY += 0.1;
 		}
 
-		timer2++;			//½Ã°£++
-		Sleep(sleepSpeed);			//ÃÊ´ç ÇÁ·¹ÀÓÀ» ¸ÂÃß±â À§ÇÑ Áö¿¬
-	} while (timer2 < 720);	//Áö¼Ó ½Ã°£¼³Á¤
+		timer2++;			//ì‹œê°„++
+		Sleep(sleepSpeed);			//ì´ˆë‹¹ í”„ë ˆì„ì„ ë§ì¶”ê¸° ìœ„í•œ ì§€ì—°
+	} while (timer2 < 720);	//ì§€ì† ì‹œê°„ì„¤ì •
 
-	isCarDraw = false;	//Â÷ ¾È±×¸²
-	isCyren = false;	//»çÀÌ·»È¿°ú ²û
+	isCarDraw = false;	//ì°¨ ì•ˆê·¸ë¦¼
+	isCyren = false;	//ì‚¬ì´ë Œíš¨ê³¼ ë”
 	objs.gameState = 4;
 
-	objs.isAniControl = false;	//¾Ö´ÏÁ¦¾î off
+	objs.isAniControl = false;	//ì• ë‹ˆì œì–´ off
 	return 0;
-}//-------------------¿£µù ¾Ö´Ï ³¡
+}//-------------------ì—”ë”© ì• ë‹ˆ ë
 
-//¸ŞÀÎÇÔ¼ö
+//ë©”ì¸í•¨ìˆ˜
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);
-	//	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);//GLUT_DOUBLEÀ» ¾²¹Ç·Î GLUT_SINGLEÀº ¾È¾¸
+	//	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);//GLUT_DOUBLEì„ ì“°ë¯€ë¡œ GLUT_SINGLEì€ ì•ˆì”€
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH | GLUT_STENCIL | GLUT_MULTISAMPLE);
 	glutInitWindowSize(800, 600);
 	glutInitWindowPosition(200, 200);
@@ -3147,78 +3147,78 @@ int main(int argc, char** argv) {
 	glClearColor(0.6, 0.6, 0.6, 1.0);
 	InitLight();
 
-	srand((unsigned int)time(NULL));		//¿ÏÀü·£´ıÀ» À§ÇØ ÀÌ·¸°Ô ¾¸. º¸Åë ½Ã°£º°(time)ÀÌ¿ë.
+	srand((unsigned int)time(NULL));		//ì™„ì „ëœë¤ì„ ìœ„í•´ ì´ë ‡ê²Œ ì”€. ë³´í†µ ì‹œê°„ë³„(time)ì´ìš©.
 
-	//devil ¶óÀÌºê·¯¸® ÃÊ±âÈ­
+	//devil ë¼ì´ë¸ŒëŸ¬ë¦¬ ì´ˆê¸°í™”
 	ilInit();
 	iluInit();
 	ilutInit();
 	ilutRenderer(ILUT_OPENGL);
 	ilutEnable(ILUT_OPENGL_CONV);
 
-	//°ø¿ë±¸Á¶Ã¼ º¯¼öÃÊ±âÈ­
-	objs.manID = 0;	//»ç¶÷ ¾ÆÀÌµğ ÃÊ±âÈ­
-	objs.EyeX; //½ÃÁ¡¼Â
+	//ê³µìš©êµ¬ì¡°ì²´ ë³€ìˆ˜ì´ˆê¸°í™”
+	objs.manID = 0;	//ì‚¬ëŒ ì•„ì´ë”” ì´ˆê¸°í™”
+	objs.EyeX; //ì‹œì ì…‹
 	objs.EyeY;
 	objs.EyeZ = 9;
-	objs.AtX = TableX / 2;		//ÃÊÁ¡¼Â
+	objs.AtX = TableX / 2;		//ì´ˆì ì…‹
 	objs.AtY = TableHeight;
 	objs.AtZ = -TableY / 2;
-	objs.isAniControl = false;	//¸ŞÀÎ¿¡¼­ ¾Ö´Ï ÄÁÆ®·ÑÇÏ³ª
-	objs.gameState = 0;	//»óÈ²»óÅÂ0
+	objs.isAniControl = false;	//ë©”ì¸ì—ì„œ ì• ë‹ˆ ì»¨íŠ¸ë¡¤í•˜ë‚˜
+	objs.gameState = 0;	//ìƒí™©ìƒíƒœ0
 	objs.gametime = 0; objs.gametime = 0;
-	//	car->pos.z = 300;			//Â÷ À§Ä¡ ¼³Á¤	
-	car->pos.z = 0;			//Â÷ À§Ä¡ ¼³Á¤
+	//	car->pos.z = 300;			//ì°¨ ìœ„ì¹˜ ì„¤ì •	
+	car->pos.z = 0;			//ì°¨ ìœ„ì¹˜ ì„¤ì •
 
-	//ÆÄÆ¼Å¬»ı¼º±â ÃÊ±âÈ­(c++´Â ÃÊ±âÈ­¾ÈÇØµµ)
+	//íŒŒí‹°í´ìƒì„±ê¸° ì´ˆê¸°í™”(c++ëŠ” ì´ˆê¸°í™”ì•ˆí•´ë„)
 	for (int i = 0; i < MAX_PGENERATOR; i++) {
 		pGenerators[i].alive = false;
 	}
 
-	//»ç¶÷ »ı¼º ¿¹(´ÙÇü¼º ÀÌ¿ë)
+	//ì‚¬ëŒ ìƒì„± ì˜ˆ(ë‹¤í˜•ì„± ì´ìš©)
 	Person* m = new Man(&objs);
 	m->manType = 0;
 	m->ctrl = 0;
 	m->actNo = MAIN_ANI;
-	objs.people.push_back(m);	//¹è¿­¿¡ ³ÖÀ½.  Ã¹¹øÂ° »ç¶÷ÀÌ ÁÖÀÎ°ø
+	objs.people.push_back(m);	//ë°°ì—´ì— ë„£ìŒ.  ì²«ë²ˆì§¸ ì‚¬ëŒì´ ì£¼ì¸ê³µ
 
 	Person* m2 = new Man(&objs);
 	m2->manType = 1;
 	m2->actNo = MAIN_ANI;
-	objs.people.push_back(m2);	//¹è¿­¿¡ ³ÖÀ½
+	objs.people.push_back(m2);	//ë°°ì—´ì— ë„£ìŒ
 
 	Person* m3 = new Man(&objs);
 	m3->manType = 2;
 	m3->actNo = MAIN_ANI;
-	objs.people.push_back(m3);	//¹è¿­¿¡ ³ÖÀ½
+	objs.people.push_back(m3);	//ë°°ì—´ì— ë„£ìŒ
 
 	Person* m4 = new Man(&objs);
 	m4->manType = 3;
 	m4->actNo = MAIN_ANI;
-	objs.people.push_back(m4);	//¹è¿­¿¡ ¤²³ÖÀ½
+	objs.people.push_back(m4);	//ë°°ì—´ì— ã…‚ë„£ìŒ
 
-	Person* w1 = new Woman(&objs);;		//¿©ÀÚ»ı¼º
+	Person* w1 = new Woman(&objs);;		//ì—¬ììƒì„±
 	w1->manType = 10;
 	w1->actNo = MAIN_ANI;
-	objs.people.push_back(w1);	//¹è¿­¿¡ ³ÖÀ½.  Ã¹¹øÂ° »ç¶÷ÀÌ ÁÖÀÎ°ø
+	objs.people.push_back(w1);	//ë°°ì—´ì— ë„£ìŒ.  ì²«ë²ˆì§¸ ì‚¬ëŒì´ ì£¼ì¸ê³µ
 
-	objs.EyeX = objs.people.at(0)->x;		//½ÃÁ¡¼Â
+	objs.EyeX = objs.people.at(0)->x;		//ì‹œì ì…‹
 	objs.EyeY = objs.people.at(0)->y + 7.5;// + 5;
 	objs.EyeZ = objs.people.at(0)->z + 10; // + 5;
 
-	objs.AtX = objs.people.at(0)->x;		//ÃÊÁ¡¼Â
+	objs.AtX = objs.people.at(0)->x;		//ì´ˆì ì…‹
 	objs.AtY = objs.people.at(0)->y + 2;
 	objs.AtZ = objs.people.at(0)->z;
 
 	InitPosition();
-	//mciSendString("play pro2_runBgm.wav", 0, 0, 0);	//ÇÁ·ÎÁ§Æ®¼Ó¼º ¸ÖÆ¼¹ÙÀÌÆ®»ç¿ë
+	//mciSendString("play pro2_runBgm.wav", 0, 0, 0);	//í”„ë¡œì íŠ¸ì†ì„± ë©€í‹°ë°”ì´íŠ¸ì‚¬ìš©
 	//	mciSendString("play sound\\bgm01.mp3 repeat", 0, 0, 0);//play bgm
 //	mciSendString("pause sound\\bgm01.mp3", 0, 0, 0);//pause bgm
 //	mciSendString("resume sound\\bgm01.mp3", 0, 0, 0);//resume bgm
 //	mciSendString("stop sound\\bgm01.mp3", 0, 0, 0);		//stop bgm
 //	mciSendString("play sound\\hit1.mp3 repeat ", 0, 0, 0);	
 
-	//ÅØ½ºÃ³ ·Îµå
+	//í…ìŠ¤ì²˜ ë¡œë“œ
 	objs.textures[0] = loadImage("images\\board256.jpg");
 	objs.textures[1] = loadImage("images\\face01_2561.jpg");
 	objs.textures[2] = loadImage("images\\face01_2562.jpg");
@@ -3235,56 +3235,56 @@ int main(int argc, char** argv) {
 
 	Create_List();
 
-	CalculateEyeXY();		//½ÃÁ¡°è»ê
-	CalculateRadius();		//ÃÊÁ¡-½ÃÁ¡ °Å¸®°è»ê
+	CalculateEyeXY();		//ì‹œì ê³„ì‚°
+	CalculateRadius();		//ì´ˆì -ì‹œì  ê±°ë¦¬ê³„ì‚°
 
 	glutDisplayFunc(MyDisplay);
 	glutKeyboardFunc(MyKeyboard);
-	glutSpecialFunc(Specialkeys);	//¹æÇâÅ°
-	glutKeyboardUpFunc(MyKeyboardUp);	//Å°º¸µå ¶À °¨Áö. ½Å¹öÀü glut.dll ÇÊ¿ä
+	glutSpecialFunc(Specialkeys);	//ë°©í–¥í‚¤
+	glutKeyboardUpFunc(MyKeyboardUp);	//í‚¤ë³´ë“œ ë—Œ ê°ì§€. ì‹ ë²„ì „ glut.dll í•„ìš”
 	glutMouseFunc(MyMouseMove);
 	glutMotionFunc(MyMotion);
-	//	glutPassiveMotionFunc(MyPassiveMotion);	//¸¶¿ì½º ±×³ÉÀÌµ¿ °¨Áö Äİ¹é
+	//	glutPassiveMotionFunc(MyPassiveMotion);	//ë§ˆìš°ìŠ¤ ê·¸ëƒ¥ì´ë™ ê°ì§€ ì½œë°±
 	glutReshapeFunc(MyReshape);
 
-	glutTimerFunc(sleepSpeed, MyTimer, 1);		//ÃÊ´ç70ÇÁ·¹ÀÓ. Å¸ÀÌ¸Ó µî·Ï
+	glutTimerFunc(sleepSpeed, MyTimer, 1);		//ì´ˆë‹¹70í”„ë ˆì„. íƒ€ì´ë¨¸ ë“±ë¡
 
 
-	GLint SubMenu2 = glutCreateMenu(MySubMenu);	//¼­ºê¸Ş´º»ı¼º2
+	GLint SubMenu2 = glutCreateMenu(MySubMenu);	//ì„œë¸Œë©”ë‰´ìƒì„±2
 	glutAddMenuEntry("On", 4);
 	glutAddMenuEntry("Off", 5);
 
-	GLint MyMainMenuID = glutCreateMenu(MyMainMenu);	//¸ŞÀÎ¸Ş´ºµî·Ï
-	glutAddMenuEntry("ÀÎÆ®·Î ½ÃÀÛ ", 50);
-	glutAddMenuEntry("°ÔÀÓÆÄÆ® Å×½ºÆ® (AI on)", 800);
-	glutAddMenuEntry("°ÔÀÓÆÄÆ® Å×½ºÆ® (AI off)", 850);
-	glutAddSubMenu("BGM on/off", SubMenu2);		//¼­ºê¸Ş´º ºÙÀÓ
-	glutAddMenuEntry("ÃÊ±âÈ­", 900);
-	glutAttachMenu(GLUT_RIGHT_BUTTON);		//¸ŞÀÎ¸Ş´º ºÙÀÓ
+	GLint MyMainMenuID = glutCreateMenu(MyMainMenu);	//ë©”ì¸ë©”ë‰´ë“±ë¡
+	glutAddMenuEntry("ì¸íŠ¸ë¡œ ì‹œì‘ ", 50);
+	glutAddMenuEntry("ê²Œì„íŒŒíŠ¸ í…ŒìŠ¤íŠ¸ (AI on)", 800);
+	glutAddMenuEntry("ê²Œì„íŒŒíŠ¸ í…ŒìŠ¤íŠ¸ (AI off)", 850);
+	glutAddSubMenu("BGM on/off", SubMenu2);		//ì„œë¸Œë©”ë‰´ ë¶™ì„
+	glutAddMenuEntry("ì´ˆê¸°í™”", 900);
+	glutAttachMenu(GLUT_RIGHT_BUTTON);		//ë©”ì¸ë©”ë‰´ ë¶™ì„
 
 	printf("--------------------------------------------------------------------- \n");
-	printf("- E : WCS¿øÁ¡°ú ÃÊÁ¡¿¡ ±¸ Ç¥½Ã & °ø°İÆÇÁ¤ / ÇÇ°İÆÇÁ¤ ±¸ Ç¥½Ã on/off \n");
-	printf("- R : ¿ÍÀÌ¾îÇÁ·¹ÀÓ on/off \n");
-	printf("- T : ÇÃ·§/±¸·Î¼ÎÀÌµù Åä±Û \n");
-	printf("- Z, X : ÁÜÀÎ/ÁÜ¾Æ¿ô \n");
-	printf("- N, M : ½ÃÁ¡À» ¿øÁ¡À» ÇâÇØ ÀÌµ¿/¸Ö¾îÁö°Ô \n");
-	printf("- C : Å¸°İ ÆÄÆ¼Å¬ on/off \n");
-	printf("- V : »ê ±×¸®±â/¾È±×¸®±â \n");
-	printf("- F : ¾È°³ on/off \n");
-	printf("- G : Æ®¸® ±×¸®±â ¸ğµå ÀüÈ¯ - ½Ç¸°´õ/ÇÁ·ºÅ»/Off \n");
-	printf("- [,] : ¾Ö´Ï¸ÅÀÌ¼Ç ¼Óµµ Á¶Àı \n");
-	printf("- P : ¾Ö´Ï¸ÅÀÌ¼Ç ÀÏ½ÃÁ¤Áö/Àç»ı \n");
-	printf("- È­»ìÇ¥Å°, Å°ÆĞµå0, Å°ÆĞµåDelete : ½ÃÁ¡ÀÌµ¿ \n");
-	printf("- Å°ÆĞµåÀÇ ¹æÇâÅ°, Å°ÆĞµå+,- : ÃÊÁ¡ÀÌµ¿ \n");
-	printf("- ¸¶¿ì½º Å¬¸¯-µå·¡±× : ½ÃÁ¡È¸Àü (»ï°¢ÇÔ¼ö¸¦ ÀÌ¿ëÇØ ÃÊÁ¡¿¡ ´ëÇÑ À§Ä¡ °è»ê) \n");
-	printf("- H : µµ¿ò¸» \n");
-	printf("- Q : Á¾·á \n");
-	printf("------------------------ ÁÖÀÎ°ø Á¶ÀÛ --------------------------------- \n");
-	printf("- W,A,S,D (¹æÇâÅ°): ÀÌµ¿ \n");
-	printf("- °°Àº¹æÇâ 2¹øÀÔ·Â : ´Ş¸®±â \n");
-	printf("- J : °ø°İ \n");
-	printf("- K : ¾îÆÛÄÆ \n");
-	printf("- F1 : ÀûÃ¼·Â1·Î      - F2 :ÁÖÀÎ°øÃ¼·Â1·Î   - F3 : ÁÖÀÎ°øÃ¼·Â Ã¤¿ò \n");
+	printf("- E : WCSì›ì ê³¼ ì´ˆì ì— êµ¬ í‘œì‹œ & ê³µê²©íŒì • / í”¼ê²©íŒì • êµ¬ í‘œì‹œ on/off \n");
+	printf("- R : ì™€ì´ì–´í”„ë ˆì„ on/off \n");
+	printf("- T : í”Œë«/êµ¬ë¡œì…°ì´ë”© í† ê¸€ \n");
+	printf("- Z, X : ì¤Œì¸/ì¤Œì•„ì›ƒ \n");
+	printf("- N, M : ì‹œì ì„ ì›ì ì„ í–¥í•´ ì´ë™/ë©€ì–´ì§€ê²Œ \n");
+	printf("- C : íƒ€ê²© íŒŒí‹°í´ on/off \n");
+	printf("- V : ì‚° ê·¸ë¦¬ê¸°/ì•ˆê·¸ë¦¬ê¸° \n");
+	printf("- F : ì•ˆê°œ on/off \n");
+	printf("- G : íŠ¸ë¦¬ ê·¸ë¦¬ê¸° ëª¨ë“œ ì „í™˜ - ì‹¤ë¦°ë”/í”„ë ‰íƒˆ/Off \n");
+	printf("- [,] : ì• ë‹ˆë§¤ì´ì…˜ ì†ë„ ì¡°ì ˆ \n");
+	printf("- P : ì• ë‹ˆë§¤ì´ì…˜ ì¼ì‹œì •ì§€/ì¬ìƒ \n");
+	printf("- í™”ì‚´í‘œí‚¤, í‚¤íŒ¨ë“œ0, í‚¤íŒ¨ë“œDelete : ì‹œì ì´ë™ \n");
+	printf("- í‚¤íŒ¨ë“œì˜ ë°©í–¥í‚¤, í‚¤íŒ¨ë“œ+,- : ì´ˆì ì´ë™ \n");
+	printf("- ë§ˆìš°ìŠ¤ í´ë¦­-ë“œë˜ê·¸ : ì‹œì íšŒì „ (ì‚¼ê°í•¨ìˆ˜ë¥¼ ì´ìš©í•´ ì´ˆì ì— ëŒ€í•œ ìœ„ì¹˜ ê³„ì‚°) \n");
+	printf("- H : ë„ì›€ë§ \n");
+	printf("- Q : ì¢…ë£Œ \n");
+	printf("------------------------ ì£¼ì¸ê³µ ì¡°ì‘ --------------------------------- \n");
+	printf("- W,A,S,D (ë°©í–¥í‚¤): ì´ë™ \n");
+	printf("- ê°™ì€ë°©í–¥ 2ë²ˆì…ë ¥ : ë‹¬ë¦¬ê¸° \n");
+	printf("- J : ê³µê²© \n");
+	printf("- K : ì–´í¼ì»· \n");
+	printf("- F1 : ì ì²´ë ¥1ë¡œ      - F2 :ì£¼ì¸ê³µì²´ë ¥1ë¡œ   - F3 : ì£¼ì¸ê³µì²´ë ¥ ì±„ì›€ \n");
 	printf("\n");
 
 	glutMainLoop();
