@@ -15,3 +15,7 @@
 
  - [22-12-11]
 5. Muzzle And Disk (COMPLETE)
+
+ - [22-12-12]
+6. Muzzle And Disk (RECOMPLETE)
+
