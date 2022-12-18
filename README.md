@@ -19,3 +19,6 @@
  - [22-12-12]
 6. Muzzle And Disk (RECOMPLETE)
 
+ - [22-12-18]
+7. Check Collision And Particle (COMPLETE)
+
